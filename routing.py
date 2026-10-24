@@ -93,18 +93,39 @@ def greedy_tour(matrix: np.ndarray) -> dict:
             "runtime_seconds": time.perf_counter() - begin, "method": "nearest_neighbor"}
 
 
-def quadratic_program(matrix: np.ndarray, penalty: float = 1000):
+DEFAULT_PENALTY = 1000.0
+
+
+def penalty_bound(matrix: np.ndarray) -> float:
+    """Smallest penalty with a proof that every invalid assignment stays above the optimum.
+
+    Any tour leaves each node exactly once, so its cost is at most
+    UB = sum_u max_v c[u, v]  (>= optimal cost C*). An invalid assignment violates
+    at least two one-hot constraints, so its QUBO value is >= 2A > C* whenever A >= UB.
+    Unlike a fixed constant, UB scales with the units and size of the matrix.
+    """
+    return max(float(np.max(matrix, axis=1).sum()), 1.0)
+
+
+def quadratic_program(matrix: np.ndarray, penalty: float | None = None):
     """QUBO of a depot-fixed, position-encoded Traveling Salesperson Problem.
 
     x[p,i] == 1 means service stop i is visited at position p (0..n-1).
     Exactly one stop per position and one position per stop. Position variables
     create a single ordered tour, thus no disconnected subtours are possible.
+    penalty=None uses max(DEFAULT_PENALTY, penalty_bound(matrix)): identical to the
+    historical 1000 for the current minute-scale data, but still correct when costs
+    grow (seconds, longer trips, more stops). Explicit penalties must be > 0.
     """
     from qiskit_optimization import QuadraticProgram
     from qiskit_optimization.converters import QuadraticProgramToQubo
     n = len(matrix) - 1
     if n < 2 or n > 4:
         raise ValueError("Research model supports 2-4 stops")
+    if penalty is None:
+        penalty = max(DEFAULT_PENALTY, penalty_bound(matrix))
+    if penalty <= 0:
+        raise ValueError("QUBO penalty must be positive")
     qp = QuadraticProgram("multi_stop_routing")
     for p in range(n):
         for i in range(n):
