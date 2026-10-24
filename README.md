@@ -1,5 +1,7 @@
 ## Aplicación de escritorio Windows integrada
 
+Para descargar: **Code → Download ZIP**. Extrae todo y abre **INICIAR_Q_RESCATE.cmd** en la carpeta principal. GitHub genera ese ZIP automáticamente; el repositorio no contiene otro ZIP incrustado. La primera instalación requiere Python e Internet.
+
 El frontend y el motor de Angelo están conectados en esta rama. Inicio reproducible, contratos, límites de cobertura, resultados reales y empaquetado: [guía de integración](docs/desktop-integration.md).
 
 ```powershell
