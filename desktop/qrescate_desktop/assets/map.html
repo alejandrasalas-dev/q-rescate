@@ -1,0 +1,104 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="vendor/leaflet.css">
+<style>
+html,body,#map{height:100%;width:100%;margin:0;background:#edf2ef;font:13px 'Segoe UI',sans-serif}
+.pin{width:30px;height:30px;border:3px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 2px 5px #24425566;color:white;background:#10a16a;display:flex;align-items:center;justify-content:center}
+.pin span{transform:rotate(45deg);font-weight:700;font-size:16px}.base{background:#d9333a}
+.handle{width:12px;height:12px;background:white;border:3px solid #149d9a;border-radius:50%;box-shadow:0 1px 4px #33445544}
+.leaflet-control-zoom a{color:#132343}.leaflet-tooltip{font-family:'Segoe UI';color:#122447;border:0;border-radius:4px}
+#notice{position:absolute;bottom:23px;right:8px;background:#fffef1ed;padding:7px 10px;z-index:900;border-radius:4px;display:none;max-width:260px;color:#674e19}
+.dark .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) contrast(.7) brightness(1.1) saturate(.7)}
+.dark,.dark #map{background:#151e2d}.dark .leaflet-control-zoom a,.dark .leaflet-tooltip,.dark .leaflet-control-attribution,.dark .leaflet-control-scale-line{background:#202d42;color:#e6edf7;border-color:#455570}
+.route-arrow{font-size:20px;text-shadow:0 1px 2px white;line-height:20px;text-align:center;pointer-events:none}
+</style></head><body><div id="map"></div><div id="notice"></div>
+<script src="vendor/leaflet.js"></script><script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+<script>
+const boundary=__SATIPO_GEOJSON__;
+const geometry=boundary.features[0].geometry;
+const polygons=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;
+function inRing(lng,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+ const a=ring[j],b=ring[i],cross=(lng-a[0])*(b[1]-a[1])-(lat-a[1])*(b[0]-a[0]);
+ if(Math.abs(cross)<1e-10&&lng>=Math.min(a[0],b[0])-1e-10&&lng<=Math.max(a[0],b[0])+1e-10&&lat>=Math.min(a[1],b[1])-1e-10&&lat<=Math.max(a[1],b[1])+1e-10)return true;
+ if((a[1]>lat)!==(b[1]>lat)&&lng<(b[0]-a[0])*(lat-a[1])/(b[1]-a[1])+a[0])inside=!inside;
+ }return inside;}
+function inSatipo(lat,lng){return polygons.some(p=>inRing(lng,lat,p[0])&&!p.slice(1).some(h=>inRing(lng,lat,h)));}
+const map=L.map('map',{zoomControl:false,zoomSnap:.25,maxBoundsViscosity:1});
+map.createPane('coverageMask');map.getPane('coverageMask').style.zIndex=410;
+const outline=L.geoJSON(boundary,{style:{color:'#149e9b',weight:3,dashArray:'8 5',fillColor:'#10bfa9',fillOpacity:.055},interactive:false}).addTo(map);
+const extent=outline.getBounds();
+const maskRings=[[[85,-180],[85,180],[-85,180],[-85,-180]],...polygons.map(p=>p[0].map(c=>[c[1],c[0]]))];
+const mask=L.polygon(maskRings,{pane:'coverageMask',stroke:false,fillColor:'#e9eef5',fillOpacity:.94,interactive:false}).addTo(map);
+map.setMaxBounds(extent);
+function lockViewport(reset=false){
+ const min=map.getBoundsZoom(extent,false,L.point(20,20));map.setMinZoom(min);
+ if(reset)map.fitBounds(extent,{padding:[10,10],animate:false});
+ else if(map.getZoom()<min)map.setZoom(min,{animate:false});
+ map.panInsideBounds(extent,{animate:false});
+}
+lockViewport(true);
+let lastValidCenter=extent.getCenter();
+map.on('moveend',()=>{
+ const center=map.getCenter();
+ if(!inSatipo(center.lat,center.lng)){
+  map.panTo(lastValidCenter,{animate:false});
+ }else lastValidCenter=center;
+});
+L.control.zoom({position:'bottomright'}).addTo(map);
+L.control.scale({position:'bottomright',imperial:false}).addTo(map);
+const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+ maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}).addTo(map);
+let failures=0;tiles.on('tileerror',()=>{if(++failures>=3)notice('No se pudieron cargar algunas teselas. Comprueba tu conexión a Internet.');});
+tiles.on('tileload',()=>{failures=0;notice('');});
+const objects=L.layerGroup().addTo(map), routes=L.layerGroup().addTo(map);
+let bridge=null, mode='', state={}, selected=null, locked=false, routeData=[], visibility={exact:true,greedy:true,qaoa:true};
+const colors={exact:'#1673e6',greedy:'#e99b20',qaoa:'#8025dc'};
+function notice(t){document.getElementById('notice').textContent=t;document.getElementById('notice').style.display=t?'block':'none';}
+function send(v){if(bridge)bridge.event(JSON.stringify(v));}
+function safeText(t){const element=document.createElement('span');element.textContent=t;return element;}
+function setMode(v){mode=v;document.getElementById('map').style.cursor=v?'crosshair':'';}
+map.on('click',e=>{if(!inSatipo(e.latlng.lat,e.latlng.lng)){notice('Fuera de cobertura: selecciona una ubicación dentro de Satipo, Junín.');return;}notice('');if(mode){send({action:'place',kind:mode,lat:e.latlng.lat,lng:e.latlng.lng});setMode('');}else send({action:'coordinate',lat:e.latlng.lat,lng:e.latlng.lng});});
+function pin(p,label,base){
+ const m=L.marker([p.lat,p.lng],{draggable:!locked,icon:L.divIcon({className:'',html:'<div class="pin '+(base?'base':'')+'"><span>'+label+'</span></div>',iconSize:[36,40],iconAnchor:[18,40]})}).addTo(objects);
+ m.bindTooltip(safeText(p.name),{direction:'top',offset:[0,-32]});
+ m.on('dragend',()=>{const l=m.getLatLng();send({action:'move',id:p.id,lat:l.lat,lng:l.lng});});
+ m.on('click',()=>send({action:'select',id:p.id}));
+ m.on('contextmenu',()=>send({action:'edit',id:p.id}));
+}
+function render(raw){
+ state=typeof raw==='string'?JSON.parse(raw):raw;objects.clearLayers();
+ if(state.base)pin(state.base,'H',true);
+ (state.destinations||[]).forEach((p,i)=>pin(p,String.fromCharCode(65+i),false));
+ (state.zones||[]).forEach(z=>{
+  const color=z.kind==='operation'?'#239c99':'#e65c4b';
+  const c=L.circle([z.lat,z.lng],{radius:z.radius_m,color,weight:2,dashArray:'8 7',fillOpacity:z.kind==='operation'?.09:.18}).addTo(objects);
+  c.bindTooltip(safeText(z.name+' · '+(z.radius_m/1000).toFixed(2)+' km'));
+  if(z.kind==='exclusion')L.marker([z.lat,z.lng],{interactive:false,icon:L.divIcon({className:'',html:'<div style="color:white;background:#db5147;border:2px solid white;border-radius:16px;width:25px;height:25px;text-align:center;font-size:20px">⊘</div>',iconSize:[29,29],iconAnchor:[14,14]})}).bindTooltip(safeText('No pasar · '+z.name),{permanent:true,direction:'right',offset:[15,0]}).addTo(objects);
+  c.on('click',()=>send({action:'select',id:z.id}));c.on('contextmenu',()=>send({action:'edit',id:z.id}));
+  if(selected===z.id&&!locked){
+   const center=L.marker([z.lat,z.lng],{draggable:true,icon:L.divIcon({className:'handle',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(objects);
+   center.bindTooltip('Arrastra para mover el centro');
+   center.on('drag',()=>c.setLatLng(center.getLatLng()));
+   center.on('dragend',()=>{let l=center.getLatLng();send({action:'move',id:z.id,lat:l.lat,lng:l.lng});});
+   const rad=Math.min(89,z.lat),lng=z.lng+z.radius_m/(111320*Math.cos(rad*Math.PI/180));
+   const edge=L.marker([z.lat,lng],{draggable:true,icon:L.divIcon({className:'handle',iconSize:[16,16],iconAnchor:[8,8]})}).addTo(objects);
+   edge.bindTooltip('Arrastra para cambiar el radio');edge.on('drag',()=>c.setRadius(map.distance([z.lat,z.lng],edge.getLatLng())));
+   edge.on('dragend',()=>send({action:'radius',id:z.id,radius_m:map.distance([z.lat,z.lng],edge.getLatLng())}));
+  }
+ });
+}
+function selectObject(id){selected=id;render(state);}
+function focusObject(id){const p=[state.base,...(state.destinations||[]),...(state.zones||[])].find(x=>x&&x.id===id);if(p)map.setView([p.lat,p.lng],Math.max(map.getZoom(),11));}
+function province(){lockViewport(true);}
+function setTheme(theme){document.body.classList.toggle('dark',theme==='dark');mask.setStyle({fillColor:theme==='dark'?'#121c2b':'#e9eef5'});}
+function setRoutes(data,visible){routeData=data;visibility=visible;routes.clearLayers();data.forEach(r=>{if(r.geometry&&visibility[r.method]){
+ L.geoJSON({type:'Feature',geometry:r.geometry,properties:{}},{style:{color:colors[r.method],weight:4,opacity:.9}}).addTo(routes);
+ const points=r.geometry.coordinates,step=Math.max(1,Math.floor((points.length-1)/10));
+ for(let i=0;i<points.length-1;i+=step){const a=points[i],b=points[i+1];if(a[0]===b[0]&&a[1]===b[1])continue;
+ const angle=Math.atan2(-(b[1]-a[1]),(b[0]-a[0])*Math.cos(a[1]*Math.PI/180))*180/Math.PI;
+ L.marker([(a[1]+b[1])/2,(a[0]+b[0])/2],{interactive:false,icon:L.divIcon({className:'route-arrow',html:'<span style="display:block;color:'+colors[r.method]+';transform:rotate('+angle+'deg)">➤</span>',iconSize:[20,20],iconAnchor:[10,10]})}).addTo(routes);
+ }
+ }});}
+new QWebChannel(qt.webChannelTransport,channel=>{bridge=channel.objects.bridge;bridge.scene.connect(render);bridge.mode.connect(setMode);bridge.selection.connect(selectObject);bridge.theme.connect(setTheme);bridge.locked.connect(v=>{locked=v;if(v)setMode('');render(state);});bridge.routes.connect((d,v)=>setRoutes(JSON.parse(d),JSON.parse(v)));send({action:'ready'});});
+window.addEventListener('resize',()=>{map.invalidateSize();lockViewport();});
+</script></body></html>
