@@ -1,0 +1,1112 @@
+{
+  "experiment": "reliability_directed_TSP",
+  "created_utc": "2026-10-24T18:05:14.692103+00:00",
+  "synthetic": true,
+  "quantum_hardware_used": false,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "logical_cpus": 9,
+    "dependencies": {
+      "qiskit": "2.6.1",
+      "qiskit-algorithms": "0.4.0",
+      "qiskit-optimization": "0.7.0",
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "networkx": "3.7",
+      "pytest": "9.1.1"
+    },
+    "base_commit": "a1676df07fbfa5fe3d8bd9002d8d1989eb0114de",
+    "working_tree_dirty": true,
+    "script_sha256": "5354b0d0dd50f7c298528baf2da034fb8e4bad65be7422adf72d4c3717e42634",
+    "routing_sha256": "5840eb09399b66cd51493655616ecba9f2d39a212d016622db769d4739cf630c",
+    "worker_thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1"
+    }
+  },
+  "configuration": {
+    "seeds": [
+      3,
+      7,
+      42
+    ],
+    "max_qubits": 9,
+    "per_run_timeout_seconds": 120.0,
+    "total_quantum_budget_seconds": 900.0,
+    "reps": 1,
+    "maxiter": 35,
+    "shots": 512,
+    "optimizer": "COBYLA"
+  },
+  "observations": [
+    "Tiempo wall incluye inicio/importaciones del subproceso; runtime del solver no.",
+    "Sin corrección de muestras ni sustitución por respuesta clásica.",
+    "Las semillas cambian aleatoriedad del solver, no generan nuevos escenarios.",
+    "Riesgo es una penalización determinista de viaje; no se usa Monte Carlo.",
+    "No se afirma ventaja cuántica."
+  ],
+  "cases": [
+    {
+      "scenario": "normal",
+      "size": 2,
+      "stops": [
+        "A",
+        "B"
+      ],
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+      "results": [
+        {
+          "tour": [
+            0,
+            1
+          ],
+          "cost": 17.0,
+          "runtime_seconds": 2.3865000002842862e-05,
+          "method": "exact_enumeration",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 17.0
+        },
+        {
+          "tour": [
+            0,
+            1
+          ],
+          "cost": 17.0,
+          "runtime_seconds": 9.623200003261445e-05,
+          "method": "nearest_neighbor",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 17.0
+        },
+        {
+          "seed": 3,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1
+          ],
+          "cost": 17.0,
+          "runtime_seconds": 1.1762777120002283,
+          "optimizer": "COBYLA",
+          "qubits": 4,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+          "wall_seconds": 2.6507783609995386,
+          "timeout_seconds": 60.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 17.0,
+          "reused_from_previous_run": true
+        },
+        {
+          "seed": 7,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1
+          ],
+          "cost": 17.0,
+          "runtime_seconds": 1.2107183540001643,
+          "optimizer": "COBYLA",
+          "qubits": 4,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+          "wall_seconds": 2.6849752130001434,
+          "timeout_seconds": 60.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 17.0,
+          "reused_from_previous_run": true
+        },
+        {
+          "seed": 42,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1
+          ],
+          "cost": 17.0,
+          "runtime_seconds": 1.1657721309993576,
+          "optimizer": "COBYLA",
+          "qubits": 4,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+          "wall_seconds": 2.69247615400036,
+          "timeout_seconds": 60.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 17.0,
+          "reused_from_previous_run": true
+        }
+      ]
+    },
+    {
+      "scenario": "normal",
+      "size": 3,
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+      "results": [
+        {
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 23.0,
+          "runtime_seconds": 7.957700017868774e-05,
+          "method": "exact_enumeration",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 23.0
+        },
+        {
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 23.0,
+          "runtime_seconds": 9.454000064579304e-06,
+          "method": "nearest_neighbor",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 23.0
+        },
+        {
+          "seed": 3,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 23.0,
+          "runtime_seconds": 49.70729791899976,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+          "wall_seconds": 51.2303086969996,
+          "timeout_seconds": 60.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 23.0,
+          "reused_from_previous_run": true
+        },
+        {
+          "seed": 7,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 23.0,
+          "runtime_seconds": 74.93743061799978,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+          "wall_seconds": 76.27634355000009,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 23.0
+        },
+        {
+          "seed": 42,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 23.0,
+          "runtime_seconds": 78.45525417799945,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+          "wall_seconds": 79.80568556900016,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 23.0
+        }
+      ]
+    },
+    {
+      "scenario": "bridge_closed",
+      "size": 3,
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          8.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          9.0,
+          7.0
+        ],
+        [
+          8.0,
+          7.0,
+          0.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+      "results": [
+        {
+          "tour": [
+            0,
+            2,
+            1
+          ],
+          "cost": 24.0,
+          "runtime_seconds": 2.323400076420512e-05,
+          "method": "exact_enumeration",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 24.0
+        },
+        {
+          "tour": [
+            0,
+            2,
+            1
+          ],
+          "cost": 24.0,
+          "runtime_seconds": 1.05460003396729e-05,
+          "method": "nearest_neighbor",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 24.0
+        },
+        {
+          "seed": 3,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 27.0,
+          "runtime_seconds": 72.62258044200007,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+          "wall_seconds": 74.28321517600034,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 12.5,
+          "optimal": false,
+          "recomputed_cost": 27.0
+        },
+        {
+          "seed": 7,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            2,
+            1
+          ],
+          "cost": 24.0,
+          "runtime_seconds": 74.6171607590004,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+          "wall_seconds": 76.20340620200022,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 24.0
+        },
+        {
+          "seed": 42,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            0,
+            2,
+            1
+          ],
+          "cost": 24.0,
+          "runtime_seconds": 62.08214861900069,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "4271aab966cec8c7f6843b5213f0f78c22b318cc4cb61ee285e55cfb2fe350a0",
+          "wall_seconds": 63.53103533600006,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 24.0
+        }
+      ]
+    },
+    {
+      "scenario": "flood_risk",
+      "size": 3,
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "distance_matrix": [
+        [
+          0.0,
+          7.0,
+          7.0,
+          8.0
+        ],
+        [
+          10.0,
+          0.0,
+          5.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          7.0
+        ],
+        [
+          10.0,
+          7.0,
+          7.0,
+          0.0
+        ]
+      ],
+      "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+      "results": [
+        {
+          "tour": [
+            2,
+            0,
+            1
+          ],
+          "cost": 28.0,
+          "runtime_seconds": 2.3964999854797497e-05,
+          "method": "exact_enumeration",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 28.0
+        },
+        {
+          "tour": [
+            0,
+            1,
+            2
+          ],
+          "cost": 29.0,
+          "runtime_seconds": 3.7155000427446794e-05,
+          "method": "nearest_neighbor",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+          "validated_feasible": true,
+          "gap_percent": 3.5714285714285716,
+          "optimal": false,
+          "recomputed_cost": 29.0
+        },
+        {
+          "seed": 3,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            2,
+            0,
+            1
+          ],
+          "cost": 28.0,
+          "runtime_seconds": 68.39582109700041,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+          "wall_seconds": 69.96355005699934,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 28.0
+        },
+        {
+          "seed": 7,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            2,
+            0,
+            1
+          ],
+          "cost": 28.0,
+          "runtime_seconds": 72.2435655929994,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+          "wall_seconds": 73.85425259099975,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 28.0
+        },
+        {
+          "seed": 42,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "status": "completed",
+          "feasible": true,
+          "tour": [
+            2,
+            0,
+            1
+          ],
+          "cost": 28.0,
+          "runtime_seconds": 61.00142327899994,
+          "optimizer": "COBYLA",
+          "qubits": 9,
+          "backend": "Qiskit StatevectorSampler (classical simulation)",
+          "matrix_sha256": "ae78a9793c406ca752a40520c053d7be36fe0e9861730cfcd7108436d67eb3e8",
+          "wall_seconds": 62.49695042999974,
+          "timeout_seconds": 120.0,
+          "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+          "method": "QAOA",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 28.0
+        }
+      ]
+    },
+    {
+      "scenario": "normal",
+      "size": 4,
+      "stops": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0,
+          8.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0,
+          7.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          4.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0,
+          2.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          3.0,
+          0.0
+        ]
+      ],
+      "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+      "results": [
+        {
+          "tour": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "cost": 25.0,
+          "runtime_seconds": 7.205700057966169e-05,
+          "method": "exact_enumeration",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 25.0
+        },
+        {
+          "tour": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "cost": 25.0,
+          "runtime_seconds": 1.3070000022707973e-05,
+          "method": "nearest_neighbor",
+          "status": "completed",
+          "qubits": 0,
+          "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+          "validated_feasible": true,
+          "gap_percent": 0.0,
+          "optimal": true,
+          "recomputed_cost": 25.0
+        },
+        {
+          "status": "skipped",
+          "reason": "Límite de qubits",
+          "qubits": 16,
+          "seed": 3,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "method": "QAOA",
+          "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+          "validated_feasible": false,
+          "gap_percent": null,
+          "optimal": false
+        },
+        {
+          "status": "skipped",
+          "reason": "Límite de qubits",
+          "qubits": 16,
+          "seed": 7,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "method": "QAOA",
+          "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+          "validated_feasible": false,
+          "gap_percent": null,
+          "optimal": false
+        },
+        {
+          "status": "skipped",
+          "reason": "Límite de qubits",
+          "qubits": 16,
+          "seed": 42,
+          "maxiter": 35,
+          "reps": 1,
+          "shots": 512,
+          "max_qubits": 9,
+          "method": "QAOA",
+          "matrix_sha256": "b7fc0e7f4f68ba6eaafd7831ced1962d695b008666323aa5e51ca8b900aa9202",
+          "validated_feasible": false,
+          "gap_percent": null,
+          "optimal": false
+        }
+      ]
+    }
+  ],
+  "previous_run": {
+    "experiment": "reliability_directed_TSP",
+    "created_utc": "2026-10-24T18:02:22.184016+00:00",
+    "synthetic": true,
+    "quantum_hardware_used": false,
+    "environment": {
+      "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+      "executable": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python",
+      "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+      "machine": "x86_64",
+      "logical_cpus": 9,
+      "dependencies": {
+        "qiskit": "2.6.1",
+        "qiskit-algorithms": "0.4.0",
+        "qiskit-optimization": "0.7.0",
+        "numpy": "2.3.5",
+        "scipy": "1.17.0",
+        "networkx": "3.7",
+        "pytest": "9.1.1"
+      },
+      "base_commit": "a1676df07fbfa5fe3d8bd9002d8d1989eb0114de",
+      "working_tree_dirty": true,
+      "script_sha256": "f053d8f36732e237b7cfa0241a6913ba06ba33ba6d8e02194aa6345637fe8aa6",
+      "routing_sha256": "5840eb09399b66cd51493655616ecba9f2d39a212d016622db769d4739cf630c",
+      "worker_thread_limits": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      }
+    },
+    "configuration": {
+      "seeds": [
+        3,
+        7,
+        42
+      ],
+      "max_qubits": 9,
+      "per_run_timeout_seconds": 60.0,
+      "total_quantum_budget_seconds": 360.0,
+      "reps": 1,
+      "maxiter": 35,
+      "shots": 512,
+      "optimizer": "COBYLA"
+    },
+    "observations": [
+      "Tiempo wall incluye inicio/importaciones del subproceso; runtime del solver no.",
+      "Sin corrección de muestras ni sustitución por respuesta clásica.",
+      "Las semillas cambian aleatoriedad del solver, no generan nuevos escenarios.",
+      "Riesgo es una penalización determinista de viaje; no se usa Monte Carlo.",
+      "No se afirma ventaja cuántica."
+    ],
+    "cases": [
+      {
+        "scenario": "normal",
+        "size": 2,
+        "stops": [
+          "A",
+          "B"
+        ],
+        "distance_matrix": [
+          [
+            0.0,
+            4.0,
+            7.0
+          ],
+          [
+            6.0,
+            0.0,
+            5.0
+          ],
+          [
+            8.0,
+            5.0,
+            0.0
+          ]
+        ],
+        "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+        "results": [
+          {
+            "tour": [
+              0,
+              1
+            ],
+            "cost": 17.0,
+            "runtime_seconds": 2.2573000023839995e-05,
+            "method": "exact_enumeration",
+            "status": "completed",
+            "qubits": 0,
+            "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 17.0
+          },
+          {
+            "tour": [
+              0,
+              1
+            ],
+            "cost": 17.0,
+            "runtime_seconds": 1.495200012868736e-05,
+            "method": "nearest_neighbor",
+            "status": "completed",
+            "qubits": 0,
+            "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 17.0
+          },
+          {
+            "seed": 3,
+            "maxiter": 35,
+            "reps": 1,
+            "shots": 512,
+            "max_qubits": 9,
+            "status": "completed",
+            "feasible": true,
+            "tour": [
+              0,
+              1
+            ],
+            "cost": 17.0,
+            "runtime_seconds": 1.1762777120002283,
+            "optimizer": "COBYLA",
+            "qubits": 4,
+            "backend": "Qiskit StatevectorSampler (classical simulation)",
+            "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+            "wall_seconds": 2.6507783609995386,
+            "timeout_seconds": 60.0,
+            "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+            "method": "QAOA",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 17.0
+          },
+          {
+            "seed": 7,
+            "maxiter": 35,
+            "reps": 1,
+            "shots": 512,
+            "max_qubits": 9,
+            "status": "completed",
+            "feasible": true,
+            "tour": [
+              0,
+              1
+            ],
+            "cost": 17.0,
+            "runtime_seconds": 1.2107183540001643,
+            "optimizer": "COBYLA",
+            "qubits": 4,
+            "backend": "Qiskit StatevectorSampler (classical simulation)",
+            "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+            "wall_seconds": 2.6849752130001434,
+            "timeout_seconds": 60.0,
+            "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+            "method": "QAOA",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 17.0
+          },
+          {
+            "seed": 42,
+            "maxiter": 35,
+            "reps": 1,
+            "shots": 512,
+            "max_qubits": 9,
+            "status": "completed",
+            "feasible": true,
+            "tour": [
+              0,
+              1
+            ],
+            "cost": 17.0,
+            "runtime_seconds": 1.1657721309993576,
+            "optimizer": "COBYLA",
+            "qubits": 4,
+            "backend": "Qiskit StatevectorSampler (classical simulation)",
+            "matrix_sha256": "0bfaf8936fd0636b4021ec4199d0544768e7f0547866ce2a29ee9c24b6db7938",
+            "wall_seconds": 2.69247615400036,
+            "timeout_seconds": 60.0,
+            "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+            "method": "QAOA",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 17.0
+          }
+        ]
+      },
+      {
+        "scenario": "normal",
+        "size": 3,
+        "stops": [
+          "A",
+          "B",
+          "C"
+        ],
+        "distance_matrix": [
+          [
+            0.0,
+            4.0,
+            7.0,
+            8.0
+          ],
+          [
+            6.0,
+            0.0,
+            5.0,
+            7.0
+          ],
+          [
+            8.0,
+            5.0,
+            0.0,
+            4.0
+          ],
+          [
+            10.0,
+            7.0,
+            5.0,
+            0.0
+          ]
+        ],
+        "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+        "results": [
+          {
+            "tour": [
+              0,
+              1,
+              2
+            ],
+            "cost": 23.0,
+            "runtime_seconds": 2.11710002986365e-05,
+            "method": "exact_enumeration",
+            "status": "completed",
+            "qubits": 0,
+            "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 23.0
+          },
+          {
+            "tour": [
+              0,
+              1,
+              2
+            ],
+            "cost": 23.0,
+            "runtime_seconds": 9.434000276087318e-06,
+            "method": "nearest_neighbor",
+            "status": "completed",
+            "qubits": 0,
+            "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 23.0
+          },
+          {
+            "seed": 3,
+            "maxiter": 35,
+            "reps": 1,
+            "shots": 512,
+            "max_qubits": 9,
+            "status": "completed",
+            "feasible": true,
+            "tour": [
+              0,
+              1,
+              2
+            ],
+            "cost": 23.0,
+            "runtime_seconds": 49.70729791899976,
+            "optimizer": "COBYLA",
+            "qubits": 9,
+            "backend": "Qiskit StatevectorSampler (classical simulation)",
+            "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+            "wall_seconds": 51.2303086969996,
+            "timeout_seconds": 60.0,
+            "worker_stderr": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_dsolve/linsolve.py:606: SparseEfficiencyWarning: splu converted its input to CSC format\n  return splu(A).solve\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/linalg/_matfuncs.py:707: SparseEfficiencyWarning: spsolve is more efficient when sparse b is in the CSC matrix format\n  return spsolve(Q, P)\n/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/site-packages/scipy/sparse/_index.py:174: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil and dok are more efficient.\n  self._set_intXint(row, col, x.flat[0])\n",
+            "method": "QAOA",
+            "validated_feasible": true,
+            "gap_percent": 0.0,
+            "optimal": true,
+            "recomputed_cost": 23.0
+          },
+          {
+            "status": "timeout",
+            "qubits": 9,
+            "timeout_seconds": 60.0,
+            "wall_seconds": 60.076495217999764,
+            "seed": 7,
+            "maxiter": 35,
+            "reps": 1,
+            "shots": 512,
+            "max_qubits": 9,
+            "method": "QAOA",
+            "matrix_sha256": "dd68b098b48be4648355353d1058267f72ce93ca691ea30ea0c2504aa406db0b",
+            "validated_feasible": false,
+            "gap_percent": null,
+            "optimal": false
+          }
+        ]
+      }
+    ],
+    "interruption_note": "Se detuvo tras observar timeout de semilla 7 a 60 s. Se conserva el checkpoint; un intento activo sin resultado no se cuenta como completado."
+  }
+}

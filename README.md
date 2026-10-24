@@ -2,6 +2,18 @@
 
 Exploratory prototype for Qiskit Fall Fest 2026. All inputs and costs are **synthetic** and are not operational emergency guidance.
 
+## Directed routing study (this branch)
+
+`routing.py` implements depot-fixed multi-stop directed tours, separately from
+the original assignment prototype described below. Carlos's reproducible study,
+resource limits, results and limitations are documented in
+[docs/benchmarks.md](docs/benchmarks.md).
+
+```bash
+python -m pytest -q
+python experiments/benchmark_reliability.py --max-qubits 9 --timeout-seconds 120 --total-seconds 900
+```
+
 ## What it tests
 Qiskit QAOA and exact enumeration on 3 brigades and 3 communities, with one-to-one assignments under three scenarios: normal roads, a blocked road, and increased travel risk. The exact classical optimum considers all six valid permutations. QAOA runs locally with nine binary variables mapped to qubits.
 
