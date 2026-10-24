@@ -1,5 +1,8 @@
 # Q-Route | Optimización híbrida de rutas para emergencias
 
+**Categoría:** Algoritmos y aplicaciones  
+**Reto:** Optimización de rutas y conexiones mediante algoritmos cuánticos.
+
 > **¿Qué ocurre cuando una emergencia crece, una carretera se bloquea y las decisiones deben tomarse con recursos limitados?**  
 > Q-Route convierte esa pregunta en un experimento reproducible de optimización clásica y cuántica con **IBM Qiskit**.
 
