@@ -284,5 +284,56 @@ En el código esto ya se cumple: `bridge_closed` (cierre) y `flood_risk` (+8 min
 - No usamos hardware cuántico real, solo un simulador clásico.
 - **Lo que sí afirmamos:** la formulación es **correcta** (secciones 1 a 4), **general** (5.1) y **compatible** con algoritmos cuánticos actuales y futuros. Q-Route queda preparada para evaluarlos cuando el hardware madure.
 
-<!-- Secciones siguientes: 6 explicación 90 s · 7 Grover (nota) · 8 referencias -->
+---
 
+## 6. Explicación para el jurado (90 segundos)
+
+> **Problema (15 s).** Durante El Niño, lluvias e inundaciones bloquean carreteras y dejan comunidades aisladas. Lo mismo pasa en un incendio urbano cuando las calles se obstruyen. Decidir **en qué orden** visitar los puntos afectados es un problema combinatorio: con $n$ puntos hay $n!$ órdenes posibles.
+>
+> **Capa clásica (15 s).** Q-Route primero calcula con Dijkstra el tiempo real entre cada par de puntos, esquivando las vías cerradas y penalizando las riesgosas. El resultado es una matriz de tiempos. Lo único que cambia de un escenario a otro es esa matriz.
+>
+> **QUBO (20 s).** Cada qubit responde una pregunta de sí o no: *¿el punto $i$ se atiende en el turno $p$?* El tiempo total de la ruta es una función cuadrática de esas variables. Las reglas "un punto por turno" y "cada punto una vez" se agregan como penalidades. Demostramos que solo las rutas válidas pueden ser óptimas y que no aparecen subtours.
+>
+> **Hamiltoniano (15 s).** Al cambiar cada variable binaria por un espín, el QUBO se convierte en la energía de un sistema de espines (un Hamiltoniano de Ising). **La mejor ruta es el estado de mínima energía.** Lo verificamos en las 96 rutas de prueba.
+>
+> **QAOA en Qiskit (15 s).** QAOA prepara ese estado alternando dos operaciones: una que aplica el costo y otra que mezcla los estados. Un optimizador clásico ajusta los ángulos del circuito. Es un algoritmo híbrido, pensado para el hardware cuántico actual.
+>
+> **Honestidad (10 s).** Validamos todo contra la solución exacta. A esta escala lo clásico es más rápido y no prometemos una ventaja cuántica. Lo que entregamos es una formulación correcta, probada y general, lista para evaluarse a medida que el hardware crezca.
+
+**Versión de una línea:** *"Convertimos una ruta en una energía: la mejor ruta es el estado de mínima energía de un sistema de qubits, y QAOA lo busca."*
+
+---
+
+## 7. Nota: Grover Adaptive Search (trabajo futuro, no implementado)
+
+- **Idea.** *Grover Adaptive Search* (GAS, disponible en Qiskit como `GroverOptimizer`) busca una ruta con costo menor que un umbral $T$. Un oráculo cuántico marca esos estados y la amplificación de Grover aumenta su probabilidad. Cada vez que encuentra una ruta mejor, baja $T$ y repite.
+- **Por qué encaja.** Usa **el mismo QUBO** de este documento, sin reformular el problema. Para Q-Route sería un solucionador cuántico más, comparable con QAOA y con los métodos clásicos.
+- **Ganancia teórica.** Encontrar una de $M$ soluciones marcadas entre $N$ estados requiere unas $\sqrt{N/M}$ consultas al oráculo, frente a unas $N/M$ con búsqueda clásica no estructurada. Es una aceleración **cuadrática**, no exponencial.
+- **Limitaciones:**
+  - El oráculo debe calcular el costo de cada ruta dentro del circuito, lo que exige muchos qubits auxiliares y circuitos profundos.
+  - Requiere hardware con corrección de errores, que todavía no existe a la escala necesaria.
+  - Los mejores métodos clásicos de TSP (*branch-and-cut*, heurísticas como LKH) no hacen búsqueda no estructurada, así que la ventaja cuadrática no se traslada directamente.
+- **Conclusión.** GAS es una línea de investigación futura, interesante si se busca un método con mejor garantía teórica. Para el hardware actual, QAOA es la opción adecuada. **No se implementa en esta entrega.**
+
+---
+
+## 8. Referencias
+
+1. Lucas, A. (2014). *Ising formulations of many NP problems.* Frontiers in Physics 2:5. Formulación QUBO/Ising del TSP con codificación por posiciones.
+2. Farhi, E., Goldstone, J., Gutmann, S. (2014). *A Quantum Approximate Optimization Algorithm.* arXiv:1411.4028.
+3. Barkoutsos, P. et al. (2020). *Improving Variational Quantum Optimization using CVaR.* Quantum 4, 256.
+4. Hadfield, S. et al. (2019). *From the Quantum Approximate Optimization Algorithm to a Quantum Alternating Operator Ansatz.* Algorithms 12(2), 34. Mezcladores que preservan restricciones.
+5. Gilliam, A., Woerner, S., Gonciulea, C. (2021). *Grover Adaptive Search for Constrained Polynomial Binary Optimization.* Quantum 5, 428.
+6. Documentación de Qiskit Optimization: `QuadraticProgram`, `QuadraticProgramToQubo`, `MinimumEigenOptimizer`, `GroverOptimizer`.
+
+---
+
+## Resumen de criterios de aceptación (issue #5)
+
+| Criterio | Dónde |
+|---|---|
+| Notación y unidades compatibles con `routing.py` | Sección 0 |
+| Costo de las rutas válidas idéntico al objetivo QUBO con 2 y 3 paradas | Sección 4.1: 96/96, incluido $n=4$; tests `test_qubo_*` |
+| Restricciones y limitaciones explicadas, sin atribuir ventajas no medidas | Secciones 2, 3, 4.2, 4.3 y 5.4 |
+| Error de código encontrado y PR con tests que fallan antes de la corrección | Sección 3: `tests/test_penalizacion.py` (7 fallan con el código original) |
+| Archivo versionado mediante PR a `feat/real-routing` | PR desde `docs/angelo-qubo` |
