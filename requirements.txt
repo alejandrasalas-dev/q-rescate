@@ -1,0 +1,6 @@
+qiskit>=1.2,<3
+qiskit-algorithms>=0.3,<0.6
+qiskit-optimization>=0.6,<0.8
+numpy>=1.26,<3
+scipy>=1.12,<2
+pytest>=8,<10
