@@ -6,10 +6,10 @@ La interfaz construye una `Solicitud` (o su dict/JSON equivalente) y recibe un
 
 Ejemplo de solicitud (JSON):
 {
-  "base":      {"id": "H", "nombre": "Hospital base", "lat": -5.1945, "lon": -80.6328},
-  "destinos": [{"id": "A", "nombre": "Punto 1", "lat": -5.1860, "lon": -80.6290}, ...],
-  "zona_operacion": {"lat": -5.1945, "lon": -80.6328, "radio_m": 3000},
-  "exclusiones": [{"lat": -5.1900, "lon": -80.6200, "radio_m": 300}],
+  "base":      {"id": "H", "nombre": "Hospital base", "lat": -11.2537, "lon": -74.6378},
+  "destinos": [{"id": "A", "nombre": "Punto 1", "lat": -11.2480, "lon": -74.6340}, ...],
+  "zona_operacion": {"lat": -11.2537, "lon": -74.6378, "radio_m": 3000},
+  "exclusiones": [{"lat": -11.2510, "lon": -74.6400, "radio_m": 300}],
   "metodos": ["exacto", "voraz", "qaoa"],
   "semilla": 3, "shots": 512, "max_qubits": 9, "timeout_s": 180
 }
