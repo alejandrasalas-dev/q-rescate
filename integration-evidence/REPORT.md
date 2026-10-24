@@ -4,7 +4,7 @@ Fuentes: frontend `b03fe62d538bcddd6679e365b1905d803d917bc8`; PR #16 backend `a4
 
 ## Verificaciones ejecutadas
 
-- Suite conjunta anterior: **151 pruebas aprobadas**, 23 advertencias no fatales. La prueba adicional Qt con adaptador real también aprobó de forma independiente. El XML `pytest.xml` recoge la última ejecución conjunta realizada.
+- Suite conjunta final: **152 pruebas aprobadas**, 25 advertencias no fatales, 75,39 s. Incluye la prueba Qt con el adaptador real, proceso separado, geometrías y guardado/reapertura. El XML `pytest.xml` recoge esta ejecución conjunta.
 - OSM real, tres destinos: exacto 13,544 min; greedy 16,239 min. Red descargada: 1.325 nodos y 3.552 aristas; ajustes 19,2–224,7 m.
 - OSM real, dos destinos, semilla 42, 512 shots: QAOA (4 qubits) y exacto 5,576 min, plazo 180 s. Se conservaron geometrías reales y etapa parcial del clásico.
 - Exclusión: 62 aristas eliminadas y destino A inaccesible; resultado restante marcado parcial.
