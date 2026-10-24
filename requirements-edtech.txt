@@ -1,0 +1,4 @@
+qiskit>=2.1,<3
+qiskit-algorithms>=0.4,<0.5
+numpy>=1.26,<3
+pytest>=8,<10
