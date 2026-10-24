@@ -65,7 +65,7 @@ def quantum(cost, blocked=(), seed=42, reps=1, maxiter=80):
     elapsed = time.perf_counter() - start
     a = decode(result.x)
     value = evaluate(cost, a, blocked) if a is not None else float("inf")
-    return {"assignment": a, "feasible": np.isfinite(value), "cost": value,
+    return {"assignment": a, "feasible": bool(np.isfinite(value)), "cost": value,
             "runtime_seconds": elapsed, "seed": seed, "reps": reps, "maxiter": maxiter,
             "shots": 2048, "solver": "QAOA/StatevectorSampler"}
 
