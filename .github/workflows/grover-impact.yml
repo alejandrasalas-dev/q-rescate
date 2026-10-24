@@ -1,0 +1,45 @@
+name: Grover advantage in oracle-query model (Q-Route)
+
+on:
+  push:
+    branches: [feat/grover-impact]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Qiskit with existing project versions
+        run: python -m pip install -r requirements.txt
+      - name: Verify oracle phases, feasible assignments and amplitudes
+        run: |
+          python -m pytest tests/test_grover_impact.py tests/test_multi_resource_scale.py -q
+      - name: Simulate Grover search and save verified quantum measurements
+        run: |
+          set -o pipefail
+          python -m experiments.grover_impact --shots 2048 --seed 42 --output experiments/results/grover-impact.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("experiments/results/grover-impact.json").read_text())
+          assert r["qubits"] == 4
+          assert r["classical_oracle_compilation"]["all_binary_states_enumerated"] == 16
+          assert r["classical_oracle_compilation"]["feasible_plans_costed"] == 6
+          assert len(r["grover"]) == 4
+          assert r["classical_exact"]["cost"] <= r["greedy"]["cost"]
+          assert r["grover"][3]["ideal_success_probability"] > .95
+          assert r["grover"][3]["observed_success_rate"] > .85
+          print("Amplification experimentally verified; end-to-end advantage NOT established.")
+          PY
+      - name: Upload full Grover simulation and limitations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grover-impact-evidence
+          path: experiments/results/grover-impact.json
+          if-no-files-found: warn
