@@ -1,0 +1,72 @@
+name: Q-Route multi-resource and geographic scaling
+
+on:
+  push:
+    branches: [feat/multi-resource-peru-scale]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Qiskit and NetworkX dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Test multi-resource mathematical formulation
+        run: |
+          python -m pytest tests/test_multi_resource_scale.py tests/test_routing.py -q
+      - name: Simulate 27 regional / national-scale classical scenarios
+        run: |
+          set -o pipefail
+          python -m experiments.multi_resource_scale --output experiments/results/multi-resource-classical.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("experiments/results/multi-resource-classical.json").read_text())
+          assert len(r["cases"])==27
+          assert r["real_Peru_road_network"] is False
+          assert {c["resource_count"] for c in r["cases"]}=={2,3,4}
+          assert {c["span_km"] for c in r["cases"]}=={20,200,1800}
+          for c in r["cases"]:
+              assert c["exact"]["cost"] <= c["greedy"]["cost"]+1e-6
+              assert c["exact"]["cost"] <= c["local_swap"]["cost"]+1e-6
+          print("27 exact and heuristic multi-resource scenarios validated.")
+          PY
+      - name: Upload classical scaling data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-resource-classical
+          path: experiments/results/multi-resource-classical.json
+          if-no-files-found: warn
+      - name: Qiskit 4-qubit two-vehicle comparison on synthetic Peru-scale geometry
+        timeout-minutes: 4
+        run: |
+          set -o pipefail
+          python -m experiments.multi_resource_scale --quantum --output experiments/results/multi-resource-quantum.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("experiments/results/multi-resource-quantum.json").read_text())
+          c=[c for c in r["cases"] if c["quantum"]["status"]=="completed"]
+          assert len(c)==1
+          case=c[0]
+          assert (case["span_km"], case["scenario"], case["resource_count"]) == (1800,"blocked_roads",2)
+          assert case["quantum"]["qubits"]==4
+          if case["quantum"]["feasible"]:
+              assert case["quantum"]["cost"] >= case["exact"]["cost"]-1e-5
+          else:
+              assert case["quantum"]["cost"] is None
+          print("Quantum simulator result validated, no forced claim of superiority.")
+          PY
+      - name: Upload quantum and classical comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-resource-quantum
+          path: experiments/results/multi-resource-quantum.json
+          if-no-files-found: warn
