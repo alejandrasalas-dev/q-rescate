@@ -1,0 +1,182 @@
+[
+  {
+    "escenario": "normal",
+    "costo_optimo": 23.0,
+    "peor_ruta": 29.0,
+    "penalidad_minima_suficiente": "> 23.0 (todo costo >= 0, cada violación suma >= A)",
+    "azar": {
+      "P_optima_por_shot": 0.001953125,
+      "P_acierta_en_512": 0.6324801087454643
+    },
+    "configs": [
+      {
+        "config": "Equipo: A=1000, p=1, 35 iter",
+        "A": 1000,
+        "P_factible_media": 0.0188,
+        "P_optima_media": 0.0071,
+        "P_optima_min_max": [
+          0.0008,
+          0.0364
+        ],
+        "amplificacion_vs_azar": 3.7,
+        "P_acierta_en_512_shots": 0.974
+      },
+      {
+        "config": "A calibrada, p=1, 35 iter",
+        "A": 29.0,
+        "P_factible_media": 0.0179,
+        "P_optima_media": 0.0058,
+        "P_optima_min_max": [
+          0.0002,
+          0.0256
+        ],
+        "amplificacion_vs_azar": 3.0,
+        "P_acierta_en_512_shots": 0.95
+      },
+      {
+        "config": "A calibrada + CVaR, p=1, 35 iter",
+        "A": 29.0,
+        "P_factible_media": 0.0529,
+        "P_optima_media": 0.0112,
+        "P_optima_min_max": [
+          0.0,
+          0.0346
+        ],
+        "amplificacion_vs_azar": 5.7,
+        "P_acierta_en_512_shots": 0.997
+      },
+      {
+        "config": "MEJORADO: A calibrada + normalizado + CVaR, p=2, 150 iter",
+        "A": 29.0,
+        "P_factible_media": 0.2578,
+        "P_optima_media": 0.0438,
+        "P_optima_min_max": [
+          0.0272,
+          0.0765
+        ],
+        "amplificacion_vs_azar": 22.4,
+        "P_acierta_en_512_shots": 1.0
+      }
+    ]
+  },
+  {
+    "escenario": "bridge_closed",
+    "costo_optimo": 24.0,
+    "peor_ruta": 32.0,
+    "penalidad_minima_suficiente": "> 24.0 (todo costo >= 0, cada violación suma >= A)",
+    "azar": {
+      "P_optima_por_shot": 0.001953125,
+      "P_acierta_en_512": 0.6324801087454643
+    },
+    "configs": [
+      {
+        "config": "Equipo: A=1000, p=1, 35 iter",
+        "A": 1000,
+        "P_factible_media": 0.0166,
+        "P_optima_media": 0.0016,
+        "P_optima_min_max": [
+          0.0,
+          0.0044
+        ],
+        "amplificacion_vs_azar": 0.8,
+        "P_acierta_en_512_shots": 0.566
+      },
+      {
+        "config": "A calibrada, p=1, 35 iter",
+        "A": 32.0,
+        "P_factible_media": 0.0208,
+        "P_optima_media": 0.0019,
+        "P_optima_min_max": [
+          0.0003,
+          0.0044
+        ],
+        "amplificacion_vs_azar": 1.0,
+        "P_acierta_en_512_shots": 0.627
+      },
+      {
+        "config": "A calibrada + CVaR, p=1, 35 iter",
+        "A": 32.0,
+        "P_factible_media": 0.0433,
+        "P_optima_media": 0.0061,
+        "P_optima_min_max": [
+          0.0003,
+          0.0258
+        ],
+        "amplificacion_vs_azar": 3.1,
+        "P_acierta_en_512_shots": 0.956
+      },
+      {
+        "config": "MEJORADO: A calibrada + normalizado + CVaR, p=2, 150 iter",
+        "A": 32.0,
+        "P_factible_media": 0.2416,
+        "P_optima_media": 0.0405,
+        "P_optima_min_max": [
+          0.0193,
+          0.0747
+        ],
+        "amplificacion_vs_azar": 20.7,
+        "P_acierta_en_512_shots": 1.0
+      }
+    ]
+  },
+  {
+    "escenario": "flood_risk",
+    "costo_optimo": 28.0,
+    "peor_ruta": 31.0,
+    "penalidad_minima_suficiente": "> 28.0 (todo costo >= 0, cada violación suma >= A)",
+    "azar": {
+      "P_optima_por_shot": 0.001953125,
+      "P_acierta_en_512": 0.6324801087454643
+    },
+    "configs": [
+      {
+        "config": "Equipo: A=1000, p=1, 35 iter",
+        "A": 1000,
+        "P_factible_media": 0.0385,
+        "P_optima_media": 0.0087,
+        "P_optima_min_max": [
+          0.0002,
+          0.0356
+        ],
+        "amplificacion_vs_azar": 4.5,
+        "P_acierta_en_512_shots": 0.989
+      },
+      {
+        "config": "A calibrada, p=1, 35 iter",
+        "A": 31.0,
+        "P_factible_media": 0.0165,
+        "P_optima_media": 0.0023,
+        "P_optima_min_max": [
+          0.0002,
+          0.008
+        ],
+        "amplificacion_vs_azar": 1.2,
+        "P_acierta_en_512_shots": 0.694
+      },
+      {
+        "config": "A calibrada + CVaR, p=1, 35 iter",
+        "A": 31.0,
+        "P_factible_media": 0.044,
+        "P_optima_media": 0.008,
+        "P_optima_min_max": [
+          0.0,
+          0.0251
+        ],
+        "amplificacion_vs_azar": 4.1,
+        "P_acierta_en_512_shots": 0.984
+      },
+      {
+        "config": "MEJORADO: A calibrada + normalizado + CVaR, p=2, 150 iter",
+        "A": 31.0,
+        "P_factible_media": 0.28,
+        "P_optima_media": 0.0468,
+        "P_optima_min_max": [
+          0.0306,
+          0.0746
+        ],
+        "amplificacion_vs_azar": 24.0,
+        "P_acierta_en_512_shots": 1.0
+      }
+    ]
+  }
+]
