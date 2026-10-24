@@ -1,0 +1,47 @@
+{
+  "name": "Demostración · Satipo · 2 destinos",
+  "base": {
+    "id": "H",
+    "name": "Base de demostración · Satipo",
+    "lat": -11.2537,
+    "lng": -74.6378
+  },
+  "destinations": [
+    {
+      "id": "A",
+      "name": "Atención A · demostración",
+      "lat": -11.248,
+      "lng": -74.634
+    },
+    {
+      "id": "B",
+      "name": "Atención B · demostración",
+      "lat": -11.26,
+      "lng": -74.642
+    }
+  ],
+  "zones": [
+    {
+      "id": "operation-example",
+      "name": "Zona de operación",
+      "lat": -11.2537,
+      "lng": -74.6378,
+      "radius_m": 1500,
+      "kind": "operation"
+    }
+  ],
+  "config": {
+    "methods": [
+      "exact",
+      "greedy",
+      "qaoa"
+    ],
+    "seed": 42,
+    "shots": 512,
+    "reps": 1,
+    "maxiter": 35,
+    "vehicles": 1,
+    "timeout_seconds": 300
+  },
+  "schema_version": 1
+}

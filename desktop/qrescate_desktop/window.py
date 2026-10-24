@@ -432,7 +432,8 @@ class MainWindow(QMainWindow):
     def load_example(self):
         if not self.allow_replace():return
         from .local_backend import from_example
-        s=from_example()
+        s=from_example('satipo_2_destinos')
+        s.name='Demostración · Satipo · 2 destinos'
         self.replace(s);self.dirty=True;self.refresh();self.statusBar().showMessage('Ejemplo del motor: ubicaciones ilustrativas. Calcular usará OSM en modo normal. Sin resultados precalculados.');self.navigate(0)
 
     def save_scenario(self):

@@ -35,6 +35,10 @@ EJEMPLOS: dict[str, dict] = {
     },
 }
 
+EJEMPLOS['satipo_2_destinos'] = copy.deepcopy(EJEMPLOS['satipo_3_destinos'])
+EJEMPLOS['satipo_2_destinos']['destinos'] = EJEMPLOS['satipo_2_destinos']['destinos'][:2]
+EJEMPLOS['satipo_2_destinos']['timeout_s'] = 300
+
 
 def ejemplo(nombre: str) -> dict:
     """Copia independiente (la interfaz puede modificarla sin afectar el original)."""
