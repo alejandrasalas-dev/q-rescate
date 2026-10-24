@@ -1,0 +1,38 @@
+name: Windows engine smoke test (Q-Route)
+on:
+  push:
+    branches:
+      - test/angelo-engine-smoke
+  workflow_dispatch:
+
+jobs:
+  clean-windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install documented dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run engine, QUBO, street-graph and Windows process tests
+        run: python -m pytest tests/test_red_vial.py tests/test_motor.py tests/test_modelo_matematico.py tests/test_penalizacion.py -q --junitxml=engine-smoke.xml
+      - name: Audit packaging requirements
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          requirements = Path("requirements.txt").read_text(encoding="utf-8").lower()
+          for name in ("osmnx", "pyside6", "pyinstaller"):
+              status = "DECLARED" if name in requirements else "NOT DECLARED"
+              print(f"Packaging dependency {name}: {status}")
+          '@ | python -
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-engine-smoke
+          path: engine-smoke.xml
+          if-no-files-found: warn
