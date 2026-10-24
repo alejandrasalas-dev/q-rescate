@@ -1,3 +1,13 @@
+## Aplicación de escritorio Windows integrada
+
+El frontend y el motor de Angelo están conectados en esta rama. Inicio reproducible, contratos, límites de cobertura, resultados reales y empaquetado: [guía de integración](docs/desktop-integration.md).
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-desktop.txt
+.\.venv\Scripts\python.exe run_qrescate.py
+```
+
 # Q-Rescate: Quantum versus classical optimization
 
 Exploratory prototype for Qiskit Fall Fest 2026. All inputs and costs are **synthetic** and are not operational emergency guidance.

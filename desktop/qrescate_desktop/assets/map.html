@@ -91,14 +91,21 @@ function selectObject(id){selected=id;render(state);}
 function focusObject(id){const p=[state.base,...(state.destinations||[]),...(state.zones||[])].find(x=>x&&x.id===id);if(p)map.setView([p.lat,p.lng],Math.max(map.getZoom(),11));}
 function province(){lockViewport(true);}
 function setTheme(theme){document.body.classList.toggle('dark',theme==='dark');mask.setStyle({fillColor:theme==='dark'?'#121c2b':'#e9eef5'});}
-function setRoutes(data,visible){routeData=data;visibility=visible;routes.clearLayers();data.forEach(r=>{if(r.geometry&&visibility[r.method]){
- L.geoJSON({type:'Feature',geometry:r.geometry,properties:{}},{style:{color:colors[r.method],weight:4,opacity:.9}}).addTo(routes);
+let routeFingerprint='';
+function setRoutes(data,visible){const fingerprint=JSON.stringify(data.filter(r=>r.geometry).map(r=>[r.method,r.geometry]));routeData=data;visibility=visible;routes.clearLayers();data.forEach(r=>{if(r.geometry&&visibility[r.method]){
+ L.geoJSON({type:'Feature',geometry:r.geometry,properties:{}},{style:{color:colors[r.method],weight:r.method==='exact'?6:3.5,opacity:.9}}).addTo(routes);
  const points=r.geometry.coordinates,step=Math.max(1,Math.floor((points.length-1)/10));
  for(let i=0;i<points.length-1;i+=step){const a=points[i],b=points[i+1];if(a[0]===b[0]&&a[1]===b[1])continue;
  const angle=Math.atan2(-(b[1]-a[1]),(b[0]-a[0])*Math.cos(a[1]*Math.PI/180))*180/Math.PI;
  L.marker([(a[1]+b[1])/2,(a[0]+b[0])/2],{interactive:false,icon:L.divIcon({className:'route-arrow',html:'<span style="display:block;color:'+colors[r.method]+';transform:rotate('+angle+'deg)">➤</span>',iconSize:[20,20],iconAnchor:[10,10]})}).addTo(routes);
  }
- }});}
+ }});
+ if(fingerprint!==routeFingerprint&&data.some(r=>r.geometry)){
+  const group=L.featureGroup(routes.getLayers().filter(layer=>layer instanceof L.GeoJSON));
+  if(group.getLayers().length)map.fitBounds(group.getBounds(),{padding:[65,65],maxZoom:15,animate:false});
+ }
+ routeFingerprint=fingerprint;
+}
 new QWebChannel(qt.webChannelTransport,channel=>{bridge=channel.objects.bridge;bridge.scene.connect(render);bridge.mode.connect(setMode);bridge.selection.connect(selectObject);bridge.theme.connect(setTheme);bridge.locked.connect(v=>{locked=v;if(v)setMode('');render(state);});bridge.routes.connect((d,v)=>setRoutes(JSON.parse(d),JSON.parse(v)));send({action:'ready'});});
 window.addEventListener('resize',()=>{map.invalidateSize();lockViewport();});
 </script></body></html>

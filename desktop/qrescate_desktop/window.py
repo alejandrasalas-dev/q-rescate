@@ -152,6 +152,7 @@ class MainWindow(QMainWindow):
             c=QVBoxLayout();c.addWidget(label(text,'muted'));c.addWidget(w);more.addLayout(c)
         extra.hide();toggle=button('Más opciones  ▾',lambda:extra.setVisible(not extra.isVisible()),'tiny');al.addWidget(toggle);al.addWidget(extra);p.addWidget(advanced)
         for w in (self.seed,self.shots,self.reps,self.maxiter):w.valueChanged.connect(self.config_changed)
+        self.timeout=spin(300,1,900);self.timeout.setSuffix(' s');more.addWidget(label('Plazo'));more.addWidget(self.timeout);self.timeout.valueChanged.connect(self.config_changed)
         self.limit_label=label('1 base · 1 vehículo · hasta 3 destinos QAOA','muted',True);p.addWidget(self.limit_label)
         self.calculate=button('Calcular recorridos',self.calculate_job,'primary');p.addWidget(self.calculate)
         self.cancel_button=button('Cancelar cálculo',self.controller.cancel);self.cancel_button.hide();p.addWidget(self.cancel_button)
@@ -226,6 +227,7 @@ class MainWindow(QMainWindow):
         self.scenario.name=self.name.text().strip() or 'Nuevo escenario'
         c=self.scenario.config;c.methods=[m for m,w in self.methods.items() if w.isChecked()]
         c.seed=self.seed.value();c.shots=self.shots.value();c.reps=self.reps.value();c.maxiter=self.maxiter.value()
+        c.timeout_seconds=self.timeout.value()
         if previous!=self.scenario.dumps():self.changed()
 
     def changed(self):
@@ -238,6 +240,8 @@ class MainWindow(QMainWindow):
         self.caps=caps
         self.loading=True
         self.shots.setRange(caps.shots_min,caps.shots_max);self.reps.setMaximum(caps.reps_max);self.maxiter.setMaximum(caps.maxiter_max)
+        if caps.fixed_reps is not None:self.reps.setValue(caps.fixed_reps);self.scenario.config.reps=caps.fixed_reps
+        if caps.fixed_maxiter is not None:self.maxiter.setValue(caps.fixed_maxiter);self.scenario.config.maxiter=caps.fixed_maxiter
         self.scenario.config.shots=self.shots.value();self.scenario.config.reps=self.reps.value();self.scenario.config.maxiter=self.maxiter.value()
         self.loading=False;self.refresh()
 
@@ -249,6 +253,10 @@ class MainWindow(QMainWindow):
         for m,w in self.methods.items():w.setChecked(m in c.methods);w.setEnabled(m in self.caps.methods and not self.controller.busy)
         for w,v in [(self.seed,c.seed),(self.shots,c.shots),(self.reps,c.reps),(self.maxiter,c.maxiter)]:w.setValue(v)
         for w in (self.seed,self.shots,self.reps,self.maxiter):w.setEnabled(not self.controller.busy)
+        self.timeout.setValue(c.timeout_seconds);self.timeout.setMaximum(self.caps.timeout_max_seconds);self.timeout.setEnabled(not self.controller.busy)
+        self.reps.setEnabled(not self.controller.busy and self.caps.fixed_reps is None);self.maxiter.setEnabled(not self.controller.busy and self.caps.fixed_maxiter is None)
+        self.reps.setToolTip('Fijo en el motor: 1' if self.caps.fixed_reps is not None else 'Repeticiones QAOA')
+        self.maxiter.setToolTip('Fijo en el motor: 35' if self.caps.fixed_maxiter is not None else 'Máximo de iteraciones')
         n=len(s.destinations);q=f'{n*n} qubits' if self.caps.qubit_encoding=='position_n_squared' else 'Según motor'
         self.qubits.setText(q)
         for w,v in zip(self.stats,[str(c.vehicles),str(n),str(sum(z.kind=='exclusion' for z in s.zones)),s.name]):w.setText(v);w.setToolTip(v)
@@ -268,12 +276,12 @@ class MainWindow(QMainWindow):
         idx=self.zones_combo.findData(self.selection);self.zones_combo.setCurrentIndex(max(0,idx))
         self.zone_edit.setEnabled(idx>0 and not self.controller.busy);self.zone_delete.setEnabled(idx>0 and not self.controller.busy)
         self.offline.setText('Backend conectado' if self.caps.connected else 'Backend no conectado')
-        self.limit_label.setText(f'{self.caps.max_bases} base · {self.caps.max_vehicles} vehículo · hasta {self.caps.max_qaoa_destinations} destinos QAOA\nMáximo: {self.caps.max_qubits} qubits')
+        self.limit_label.setText(f'{self.caps.max_bases} base · {self.caps.max_vehicles} vehículo · {self.caps.min_destinations}–{self.caps.max_qaoa_destinations} destinos QAOA\nMáximo: {self.caps.max_qubits} qubits · {self.caps.max_operation_zones} zona de operación')
         reason=validate_for_run(s,self.caps)
         self.calculate.setEnabled(not reason and not self.controller.busy);self.calculate.setToolTip(reason or 'Enviar escenario al backend')
         self.experiment_start.setEnabled(not reason and self.caps.experiments and not self.controller.busy)
         self.experiment_start.setToolTip(reason or ('' if self.caps.experiments else 'El backend no ofrece experimentos'))
-        self.experiment_note.setText(reason or ('Servicio de experimentos disponible.' if self.caps.experiments else 'El backend no ofrece el servicio de experimentos.'))
+        self.experiment_note.setText(reason or ('Servicio de experimentos disponible.' if self.caps.experiments else 'Experimentos no implementados en el adaptador local. Usa cálculos individuales con semilla, plazo y cancelación.'))
         self.cancel_button.setVisible(self.controller.busy);self.cancel_button.setEnabled(bool(self.controller.job_id) and self.caps.cancellation)
         self.cancel_button.setToolTip('Solicitar cancelación al backend' if self.caps.cancellation else 'El backend no ofrece cancelación')
         self.state_label.setText(STATES[self.job_state]+' · '+self.offline.text())
@@ -323,6 +331,8 @@ class MainWindow(QMainWindow):
                     if len(self.scenario.destinations)>=self.caps.max_destinations:return
                     self.scenario.destinations.append(Point(uid(),f'Punto de atención {len(self.scenario.destinations)+1}',lat,lng))
                 elif kind in ('operation','exclusion'):
+                    if kind=='operation' and sum(z.kind=='operation' for z in self.scenario.zones)>=self.caps.max_operation_zones:
+                        raise ValueError('Solo se admite una zona de operación. Edita o elimina la existente.')
                     z=Zone(uid(),'Zona de operación' if kind=='operation' else 'Zona de exclusión',lat,lng,3000,kind)
                     if not self.zone_editor(z):return
                     self.scenario.zones.append(z);self.selection=z.id
@@ -371,6 +381,8 @@ class MainWindow(QMainWindow):
         if d.exec()!=QDialog.DialogCode.Accepted:return False
         if not name.text().strip():QMessageBox.warning(self,'Nombre requerido','Escribe un nombre para la zona.');return False
         if not in_satipo(lat.value(),lng.value()):QMessageBox.warning(self,'Fuera de cobertura','El centro de la zona debe estar dentro de Satipo, Junín.');return False
+        if kind.currentData()=='operation' and any(other.kind=='operation' and other.id!=z.id for other in self.scenario.zones):
+            QMessageBox.warning(self,'Zona de operación','Solo se admite una zona de operación.');return False
         z.name=name.text().strip();z.kind=kind.currentData();z.lat=lat.value();z.lng=lng.value();z.radius_m=radius.value()*1000
         return True
 
@@ -409,6 +421,8 @@ class MainWindow(QMainWindow):
 
     def replace(self,s,path=None):
         validate_coverage(s)
+        if self.caps.fixed_reps is not None and s.config.reps!=self.caps.fixed_reps:raise ValueError('El motor fija reps=1; este escenario contiene otro valor.')
+        if self.caps.fixed_maxiter is not None and s.config.maxiter!=self.caps.fixed_maxiter:raise ValueError('El motor fija maxiter=35; este escenario contiene otro valor.')
         self.scenario=s;self.path=path;self.selection=None;self.results=[];self.result_scenario=None;self.job_state='ready';self.dirty=False;self.refresh()
         self.map.command('province')
 
@@ -417,11 +431,9 @@ class MainWindow(QMainWindow):
 
     def load_example(self):
         if not self.allow_replace():return
-        s=Scenario(name='Demostración · Satipo')
-        s.base=Point(uid(),'Base de demostración',-11.253,-74.638)
-        s.destinations=[Point(uid(),'Punto de atención 1',-11.128,-74.731),Point(uid(),'Punto de atención 2',-11.409,-74.489),Point(uid(),'Punto de atención 3',-11.784,-74.303)]
-        s.zones=[Zone(uid(),'Operación · demostración',-11.42,-74.51,32000,'operation'),Zone(uid(),'Exclusión · demostración',-11.32,-74.43,5000,'exclusion')]
-        self.replace(s);self.dirty=True;self.refresh();self.statusBar().showMessage('DEMOSTRACIÓN: puntos y zonas ilustrativos; no son datos operativos. Sin resultados.');self.navigate(0)
+        from .local_backend import from_example
+        s=from_example()
+        self.replace(s);self.dirty=True;self.refresh();self.statusBar().showMessage('Ejemplo del motor: ubicaciones ilustrativas. Calcular usará OSM en modo normal. Sin resultados precalculados.');self.navigate(0)
 
     def save_scenario(self):
         self.config_changed()
@@ -459,7 +471,8 @@ class MainWindow(QMainWindow):
         if snapshot.progress_percent is None:self.progress.setRange(0,0);self.progress.setTextVisible(False)
         else:self.progress.setRange(0,100);self.progress.setValue(round(snapshot.progress_percent));self.progress.setTextVisible(True)
         message=' · '.join(snapshot.messages)
-        if snapshot.error:message=f'{snapshot.error.code}: {snapshot.error.message}'
+        if snapshot.error:message=f'{snapshot.error.code}: {snapshot.error.message}'+(' · '+message if message else '')
+        if snapshot.metadata.get('engine_result',{}).get('red',{}).get('fuente')=='sintetica':message='PRUEBA SINTÉTICA EXPLÍCITA · '+message
         if not message:message=STATES[snapshot.state]
         self.result_message.setText(message);self.statusBar().showMessage(message)
         if snapshot.experiment_rows:
@@ -508,7 +521,7 @@ class MainWindow(QMainWindow):
         if not path:return
         try:
             if kind.startswith('CSV') or path.lower().endswith('.csv'):
-                output=io.StringIO(newline='');writer=csv.writer(output);writer.writerow(['received_at_utc','scenario','kind','job_id','state','seed','method','cost','unit','gap_percent','valid','duration_seconds','visit_order_json','geometry_json','messages','error_json'])
+                output=io.StringIO(newline='');writer=csv.writer(output);writer.writerow(['received_at_utc','scenario','kind','job_id','state','seed','method','cost','unit','gap_percent','valid','duration_seconds','visit_order_json','geometry_json','messages','error_json','method_status','metadata_json'])
                 for values in self.export_rows():
                     # Spreadsheet-safe export, including scenario names from imported JSON.
                     writer.writerow(["'"+v if isinstance(v,str) and v.startswith(('=','+','-','@')) else v for v in values])
@@ -527,10 +540,13 @@ class MainWindow(QMainWindow):
                 yield [h['received_at'],s.get('name',''),h['kind'],snap['job_id'],result.get('state',snap['state']),result.get('seed',s.get('config',{}).get('seed')),
                        result.get('method'),result.get('cost'),result.get('unit',''),result.get('gap_percent'),result.get('valid'),result.get('duration_seconds'),
                        json.dumps(result.get('visit_order',[]),ensure_ascii=False),json.dumps(result.get('geometry'),ensure_ascii=False),
-                       ' · '.join(messages+snap.get('messages',[])),json.dumps(snap.get('error'),ensure_ascii=False)]
+                       ' · '.join(messages+snap.get('messages',[])),json.dumps(snap.get('error'),ensure_ascii=False),
+                       result.get('status',''),json.dumps(snap.get('metadata',{}),ensure_ascii=False)]
 
     def closeEvent(self,event):
         if self.controller.busy:
-            QMessageBox.information(self,'Cálculo activo','Espera a que termine o solicita cancelación antes de cerrar.');event.ignore();return
+            answer=QMessageBox.question(self,'Cálculo activo','¿Cancelar el cálculo y cerrar la aplicación?',QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No)
+            if answer!=QMessageBox.StandardButton.Yes:event.ignore();return
+            self.controller.shutdown();self.controller.busy=False
         if not self.allow_replace():event.ignore();return
         self.controller.shutdown();event.accept()

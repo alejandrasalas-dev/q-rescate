@@ -169,3 +169,19 @@ def test_no_pasar_button_creates_an_editable_exclusion(app,window,monkeypatch):
     assert 'Puente cerrado' in w.zones_combo.currentText()
     assert js(app,w,"objects.getLayers().some(x=>x instanceof L.Circle && x.options.color==='#e65c4b')")
     w.delete_selected_zone();assert not w.scenario.zones
+
+def test_window_uses_angelo_adapter_with_separate_process(app,tmp_path,monkeypatch):
+    from qrescate_desktop.local_backend import LocalBackend,from_example
+    w=MainWindow(LocalBackend(source='sintetica'));w.show();wait(app,lambda:w.caps.connected and w.map_ready)
+    s=from_example();s.destinations=s.destinations[:2];s.config.methods=['exact','greedy'];w.replace(s)
+    assert w.calculate.isEnabled() and not w.reps.isEnabled() and not w.maxiter.isEnabled()
+    assert not w.experiment_start.isEnabled()
+    w.calculate_job();wait(app,lambda:w.job_state in ('completed','error'),seconds=60)
+    assert w.job_state=='completed' and len(w.results)==2
+    assert w.controller.history[-1]['snapshot']['metadata']['engine_result']['red']['fuente']=='sintetica'
+    assert js(app,w,'routes.getLayers().filter(x=>x instanceof L.GeoJSON).length')==2
+    path=tmp_path/'scenario.json';monkeypatch.setattr(QFileDialog,'getSaveFileName',lambda *a:(str(path),'JSON (*.json)'))
+    assert w.save_scenario();w.dirty=False
+    monkeypatch.setattr(QFileDialog,'getOpenFileName',lambda *a:(str(path),'JSON (*.json)'));w.load_scenario()
+    assert w.scenario.config.timeout_seconds==300 and w.scenario.destinations==s.destinations
+    w.dirty=False;w.close()

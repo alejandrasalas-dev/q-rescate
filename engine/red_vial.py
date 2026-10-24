@@ -107,7 +107,11 @@ def _osmnx():
 
 def obtener_red_osm(lat: float, lon: float, radio_m: float,
                     cache_dir: Optional[Path] = None, usar_cache: bool = True) -> nx.MultiDiGraph:
-    """Red 'drive' alrededor de (lat, lon). Lee/escribe caché .graphml."""
+    """Helper radial legado acotado (no usado por la app integrada).
+
+    La vía normal `red_para_solicitud(..., fuente='osm')` usa cobertura.obtener
+    con polígono, margen y límites explícitos sin el recorte radial a 8 km.
+    """
     radio_m = min(max(float(radio_m), RADIO_MIN_M), RADIO_MAX_M)
     archivo = ruta_cache(lat, lon, radio_m, cache_dir)
     ox = _osmnx()
@@ -182,9 +186,10 @@ def centro_y_radio(solicitud) -> tuple[float, float, float]:
 
 
 def red_para_solicitud(solicitud, fuente: str = "osm", **kw) -> nx.MultiDiGraph:
-    lat, lon, r = centro_y_radio(solicitud)
     if fuente == "osm":
-        return obtener_red_osm(lat, lon, r, **kw)
+        from engine.cobertura import obtener
+        return obtener(solicitud, **kw)
+    lat, lon, r = centro_y_radio(solicitud)
     if fuente == "sintetica":
         lado = max(3, int(2 * r // kw.get("paso_m", 200.0)) + 1)
         return red_sintetica(lat, lon, filas=lado, columnas=lado, **kw)

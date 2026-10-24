@@ -53,11 +53,12 @@ class Config:
     reps: int = 1
     maxiter: int = 35
     vehicles: int = 1
+    timeout_seconds: int = 300
 
     def __post_init__(self):
         if not isinstance(self.methods, list) or any(m not in METHODS for m in self.methods) or len(set(self.methods)) != len(self.methods):
             raise ValueError("Métodos inválidos")
-        for attr, low, high in (("seed", 0, 2147483647), ("shots", 1, 10000000), ("reps", 1, 1000), ("maxiter", 1, 1000000), ("vehicles", 1, 100)):
+        for attr, low, high in (("seed", 0, 2147483647), ("shots", 1, 10000000), ("reps", 1, 1000), ("maxiter", 1, 1000000), ("vehicles", 1, 100), ("timeout_seconds",1,900)):
             v = getattr(self, attr)
             number(v, low, high)
             if not isinstance(v, int):
@@ -117,6 +118,11 @@ class Capabilities:
     experiments: bool = False
     cancellation: bool = False
     qubit_encoding: str = "position_n_squared"
+    min_destinations: int = 1
+    max_operation_zones: int = 1
+    fixed_reps: int | None = None
+    fixed_maxiter: int | None = None
+    timeout_max_seconds: int = 900
 
 @dataclass
 class BackendError:
@@ -153,6 +159,8 @@ class MethodResult:
     geometry: Geometry | None = None
     messages: list[str] = field(default_factory=list)
     unit: str = ""
+    status: str = "ok"
+    metadata: dict = field(default_factory=dict)
 
     def __post_init__(self):
         if self.method not in METHODS:
@@ -172,6 +180,7 @@ class JobSnapshot:
     progress_percent: float | None = None
     error: BackendError | None = None
     experiment_rows: list[dict] = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
 
     def __post_init__(self):
         if self.state not in STATES:
@@ -186,6 +195,16 @@ def validate_for_run(s: Scenario, caps: Capabilities):
         return "Coloca una base en el mapa."
     if not s.destinations:
         return "Agrega al menos un destino."
+    if len(s.destinations)<caps.min_destinations:
+        return f"El motor requiere al menos {caps.min_destinations} destinos."
+    if sum(z.kind=='operation' for z in s.zones)>caps.max_operation_zones:
+        return f"El motor admite {caps.max_operation_zones} zona de operación."
+    if caps.fixed_reps is not None and s.config.reps!=caps.fixed_reps:
+        return f"El motor utiliza reps={caps.fixed_reps} fijo."
+    if caps.fixed_maxiter is not None and s.config.maxiter!=caps.fixed_maxiter:
+        return f"El motor utiliza maxiter={caps.fixed_maxiter} fijo."
+    if s.config.timeout_seconds>caps.timeout_max_seconds:
+        return "El plazo excede el límite del motor."
     if len(s.destinations) > caps.max_destinations:
         return f"El backend admite hasta {caps.max_destinations} destinos."
     if not s.config.methods:

@@ -38,7 +38,8 @@ def _trabajador(solicitud: dict, opciones: dict, cola) -> None:
     """Corre en el proceso hijo. Envía ('etapa', texto) y al final ('fin', dict)."""
     try:
         from engine.motor import calcular_recorridos
-        res = calcular_recorridos(solicitud, progreso=lambda m: cola.put(("etapa", m)), **opciones)
+        res = calcular_recorridos(solicitud, progreso=lambda m: cola.put(("etapa", m)),
+                                 parcial=lambda d:cola.put(('parcial',d)), **opciones)
         cola.put(("fin", res.a_dict()))
     except BaseException as e:  # noqa: BLE001 — cualquier fallo vuelve como mensaje legible
         cola.put(("fin", Resultado(estado="error", mensaje=f"{type(e).__name__}: {e}").a_dict()))
@@ -58,6 +59,8 @@ class Calculo:
         self._proc: Optional[mp.Process] = None
         self._inicio = 0.0
         self._resultado: Optional[dict] = None
+        self.parcial: Optional[dict] = None
+        self._cerrado = False
         if iniciar:
             self.iniciar()
 
@@ -78,8 +81,10 @@ class Calculo:
             self._proc.join(2)
             if self._proc.is_alive():
                 self._proc.kill()
+                self._proc.join(2)
         self.etapa = mensaje
-        self._resultado = Resultado(estado=estado, mensaje=mensaje).a_dict()
+        self._resultado = dict(self.parcial) if self.parcial else Resultado(estado=estado).a_dict()
+        self._resultado.update(estado=estado,mensaje=mensaje)
         return self._resultado
 
     def consultar(self) -> Optional[dict]:
@@ -93,6 +98,8 @@ class Calculo:
                 break
             if tipo == "etapa":
                 self.etapa = dato
+            elif tipo == 'parcial':
+                self.parcial = dato
             elif tipo == "fin":
                 self._resultado = dato
                 self.etapa = dato.get("mensaje", "Terminado")
@@ -118,6 +125,16 @@ class Calculo:
         while (res := self.consultar()) is None:
             time.sleep(intervalo_s)
         return res
+
+    def cerrar(self) -> None:
+        """Release owned processes/IPC after a terminal result or application close."""
+        if self._cerrado:return
+        if self._proc is not None:
+            if self._proc.is_alive():self.cancelar()
+            self._proc.join(2)
+            if self._proc.is_alive():self._proc.kill();self._proc.join(2)
+            self._proc.close()
+        self._cola.cancel_join_thread();self._cola.close();self._cerrado=True
 
 
 def ejecutar(solicitud: dict, timeout_s: Optional[float] = None, **opciones) -> dict:

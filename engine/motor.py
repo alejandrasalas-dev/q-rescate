@@ -117,7 +117,10 @@ def _coords_tramo(G: nx.MultiDiGraph, u, v) -> list[list[float]]:
     d = min(datos.values(), key=lambda e: e.get("travel_time", float("inf")))
     geom = d.get("geometry")
     if geom is not None and hasattr(geom, "coords"):
-        return [[float(y), float(x)] for x, y in geom.coords]
+        coords=[[float(y), float(x)] for x, y in geom.coords]
+        start=G.nodes[u]
+        if haversine_m(start['y'],start['x'],*coords[-1])<haversine_m(start['y'],start['x'],*coords[0]):coords.reverse()
+        return coords
     return [[G.nodes[u]["y"], G.nodes[u]["x"]], [G.nodes[v]["y"], G.nodes[v]["x"]]]
 
 
@@ -156,7 +159,7 @@ def _tour_valido(tour, n: int) -> bool:
 
 # --------------------------------------------------------------- principal
 def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGraph] = None,
-                        progreso: Progreso = None) -> Resultado:
+                        progreso: Progreso = None, parcial=None) -> Resultado:
     """Punto de entrada único. `G` permite inyectar una red (tests)."""
     avisar = progreso or (lambda _m: None)
     try:
@@ -176,6 +179,8 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
     H, n_excl = aplicar_exclusiones(G, sol.exclusiones)
     info_red = resumen_red(G)
     info_red["aristas_excluidas"] = n_excl
+    if G.graph.get('coverage_json'):info_red['coverage']=json.loads(G.graph['coverage_json'])
+    if G.graph.get('cache_key'):info_red['cache_key']=G.graph['cache_key']
 
     avisar("Ajustando puntos a la red…")
     principal = set(_componente_principal(G))
@@ -189,6 +194,9 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
         return Resultado(estado="error", mensaje=str(e), red=info_red)
     for p in puntos:
         p["lejos_de_calle"] = p["distancia_m"] > DIST_AJUSTE_AVISO_M
+    # Never present a far-away stop snapped to a small/disconnected road fragment as served.
+    if any(p['distancia_m']>1000 for p in puntos):
+        return Resultado(estado='error',mensaje='Cobertura vial insuficiente: ajuste a la vía mayor de 1000 m. Selecciona un punto más cercano a una vía transitable; no se calcularon rutas.',puntos=puntos,red=info_red)
 
     avisar("Calculando tiempos entre puntos…")
     M_total, _ = matriz_tiempos(H, [p["nodo"] for p in puntos])
@@ -212,6 +220,10 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
     n = len(activos) - 1
 
     metodos: list[ResultadoMetodo] = []
+    def publicar():
+        if parcial:
+            parcial(Resultado(estado='en_curso',mensaje='Resultados parciales; cálculo en curso.',
+                              matriz_min=_lista(M),metodos=metodos,**base_kw).a_dict())
     costo_exacto = None
     orden_metodos = sorted(sol.metodos, key=lambda m: ("exacto", "voraz", "qaoa").index(m))
     for m in orden_metodos:
@@ -222,10 +234,12 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
         except Exception as e:  # noqa: BLE001 — se informa a la interfaz
             metodos.append(ResultadoMetodo(m, "error", duracion_s=time.perf_counter() - t0,
                                            detalle=f"{type(e).__name__}: {e}"))
+            publicar()
             continue
         dur = r.get("runtime_seconds", time.perf_counter() - t0)
         if r.get("status") == "skipped":
             metodos.append(ResultadoMetodo(m, "omitido", duracion_s=dur, detalle=r.get("reason", "")))
+            publicar()
             continue
         tour = r.get("tour")
         valida = _tour_valido(tour, n)
@@ -243,11 +257,13 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
             info = f"{r.get('qubits')} qubits, {r.get('backend', '')}".strip()
             rm.detalle = f"{rm.detalle} {info}".strip()
         metodos.append(rm)
+        publicar()
 
-    if costo_exacto:
+    if costo_exacto is not None:
         for rm in metodos:
             if rm.costo_min is not None:
-                rm.gap_pct = round(100 * (rm.costo_min - costo_exacto) / costo_exacto, 2)
+                rm.gap_pct = (round(100 * (rm.costo_min - costo_exacto) / abs(costo_exacto), 2)
+                              if costo_exacto else (0.0 if rm.costo_min==0 else None))
 
     msg = "Cálculo completado."
     if inaccesibles:

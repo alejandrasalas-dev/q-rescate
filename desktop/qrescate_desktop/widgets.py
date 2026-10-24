@@ -72,11 +72,12 @@ class ResultCard(QFrame):
         fmt=lambda v:'—' if v is None else f'{v:g}'
         self.values[0].setText(fmt(result.cost)+(f' {result.unit}' if result.unit else ''))
         self.values[1].setText('—' if result.valid is None else ('✓ Sí' if result.valid else '✕ No'))
+        if result.metadata.get('covers_all_destinations') is False:self.values[1].setText('Parcial')
         self.values[1].setStyleSheet('color:'+('#10a16a' if result.valid else '#d34b42'))
         self.values[2].setText(fmt(result.gap_percent)+(' %' if result.gap_percent is not None else ''))
         order=' → '.join(points.get(p,p) for p in result.visit_order)
         duration='Duración: '+fmt(result.duration_seconds)+(' s' if result.duration_seconds is not None else '')
-        self.detail.setText(duration+' · '+('Visitas: '+order if order else 'Orden no informado')+('\n'+' · '.join(result.messages) if result.messages else ''))
+        self.detail.setText((result.status.upper()+' · ' if result.status!='ok' else '')+duration+' · '+('Visitas: '+order if order else 'Orden no informado')+('\n'+' · '.join(result.messages) if result.messages else ''))
 
 STYLE='''
 QWidget { font-family:"Segoe UI"; font-size:14px; color:#142344; }

@@ -73,6 +73,7 @@ class Controller(QObject):
                 self.capabilities_ready.emit(result)
             return
         if op == "cancel":
+            if not self.busy:return
             # Cancellation is a request; backend remains authority on final state.
             self.updated.emit(JobSnapshot(self.job_id or "", "running", messages=[error.message if error else "Cancelación solicitada; esperando confirmación."]))
             return
@@ -100,4 +101,6 @@ class Controller(QObject):
 
     def shutdown(self):
         self.timer.stop()
-        self.executor.shutdown(wait=False, cancel_futures=True)
+        cleanup=getattr(self.backend,'shutdown',None)
+        if cleanup:cleanup()
+        self.executor.shutdown(wait=True, cancel_futures=True)
