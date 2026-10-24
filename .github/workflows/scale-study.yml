@@ -1,0 +1,69 @@
+name: Q-Route scale study roads vs destinations
+
+on:
+  push:
+    branches: [feat/scaling-study]
+  pull_request:
+    branches: [feat/real-routing]
+  workflow_dispatch:
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing Qiskit routing dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Validate 27 scenarios and Held-Karp optimality checks
+        run: |
+          python -m pytest tests/test_scale_study.py -q
+          python -m pytest tests/test_routing.py -q
+      - name: Calculate classical scaling across 25 to 400 road nodes
+        run: |
+          python -m experiments.scale_study --output experiments/results/scale-classical.json
+          python - <<'PY'
+          import json
+          with open('experiments/results/scale-classical.json') as f:
+              data=json.load(f)
+          cases=data["cases"]
+          assert len(cases)==27
+          assert set(c["road_nodes"] for c in cases)=={25,100,400}
+          assert set(c["service_stops"] for c in cases)=={3,6,10}
+          assert all(c["classical_exact"]["cost"] <= c["classical_2opt"]["cost"] for c in cases)
+          print("27 synthetic classical scale cases validated.")
+          PY
+      - name: Upload complete classical scaling results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qroute-scale-classical
+          path: experiments/results/scale-classical.json
+          if-no-files-found: warn
+      - name: One bounded Qiskit QAOA scaling comparison
+        timeout-minutes: 6
+        run: |
+          python -m experiments.scale_study --quantum --output experiments/results/scale-quantum.json
+          python - <<'PY'
+          import json
+          with open('experiments/results/scale-quantum.json') as f:
+              data=json.load(f)
+          comparisons=[c for c in data["cases"] if "qaoa" in c]
+          assert len(comparisons)==1
+          c=comparisons[0]
+          assert c["road_nodes"]==100 and c["service_stops"]==3
+          assert c["quantum_feasibility"]["qubits_required"]==9
+          assert c["qaoa"]["status"]=="completed"
+          assert c["qaoa"]["feasible"] or c["qaoa"]["cost"] is None
+          print("Qiskit simulated QAOA result retained without inventing advantage.")
+          PY
+      - name: Upload quantum comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qroute-scale-quantum
+          path: experiments/results/scale-quantum.json
+          if-no-files-found: warn
