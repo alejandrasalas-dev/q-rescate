@@ -1,0 +1,29 @@
+{
+  "name": "Ejemplo OSM · Satipo",
+  "base": null,
+  "destinations": [],
+  "zones": [
+    {
+      "id": "operation-example",
+      "name": "Zona de operación",
+      "lat": -11.2537,
+      "lng": -74.6378,
+      "radius_m": 1500,
+      "kind": "operation"
+    }
+  ],
+  "config": {
+    "methods": [
+      "exact",
+      "qaoa",
+      "greedy"
+    ],
+    "seed": 42,
+    "shots": 512,
+    "reps": 1,
+    "maxiter": 35,
+    "vehicles": 1,
+    "timeout_seconds": 300
+  },
+  "schema_version": 1
+}
