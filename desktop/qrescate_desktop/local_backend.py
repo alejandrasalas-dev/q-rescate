@@ -74,8 +74,8 @@ def to_snapshot(job_id,raw,request=None,stage=''):
         state='error';messages.append('Ningún método completó un resultado correcto.')
     error=None
     if state=='error':
-        code='TIMEOUT' if status=='tiempo_agotado' else 'ENGINE_ERROR'
-        error=BackendError(code,raw.get('mensaje') or 'Error del motor',details={'engine_state':status})
+        code='TIMEOUT' if status=='tiempo_agotado' else ('NETWORK_UNAVAILABLE' if raw.get('red',{}).get('download_errors') else 'ENGINE_ERROR')
+        error=BackendError(code,raw.get('mensaje') or 'Error del motor',details={'engine_state':status,'download_errors':raw.get('red',{}).get('download_errors',[])},retryable=code=='NETWORK_UNAVAILABLE')
     return JobSnapshot(job_id,state,results=results,messages=messages,error=error,
                        metadata={'engine_result':copy.deepcopy(raw),'engine_request':copy.deepcopy(request),
                                  'unreachable_ids':list(inaccessible),'snapped_points':copy.deepcopy(raw.get('puntos',[]))})

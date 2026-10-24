@@ -22,3 +22,11 @@ No se probó en otra máquina Windows limpia sin Python. No se validó una desca
 No se cambiaron el QUBO ni las penalizaciones de Angelo para resolver la interfaz. Las extensiones de su motor cubren adquisición provincial, rechazo de ajustes mayores de 1 km, geometría orientada, resultados parciales y liberación de procesos. Los costos de OSM usan velocidades estimadas; no son tiempos de respuesta operativos validados.
 
 No se fusionó el PR #16 ni el PR de integración.
+
+## Corrección de timeout OSM
+
+La descarga dependía exclusivamente de overpass-api.de. Ahora verifica disponibilidad con conexión de 5 s/lectura de 7 s, alterna con overpass.private.coffee y evita los reintentos recursivos de OSMnx ante 429/502/503/504. Conserva el plazo externo del proceso y el control de slots del servicio. Los dos son servidores OSM reales; no se añade ningún fallback sintético.
+
+Se reutiliza una caché de otra selección solo si su manifiesto conserva el polígono completo original y este contiene toda la nueva petición; no se infiere cobertura por bounding box. Se conserva el detalle técnico exportable y se presenta un mensaje único, legible y reintentable.
+
+En esta comprobación de red ambos endpoints públicos fallaron (ConnectTimeout/ReadTimeout); por ello no se afirma haber completado una descarga nueva durante la interrupción externa. Sí se completó una ejecución real OSM desde la caché existente (`osm-retry-cache.json`), y se probaron fallos/reintentos controlados sin usar datos sintéticos.

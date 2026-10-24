@@ -185,10 +185,10 @@ def centro_y_radio(solicitud) -> tuple[float, float, float]:
     return lat, lon, min(max(r, RADIO_MIN_M), RADIO_MAX_M)
 
 
-def red_para_solicitud(solicitud, fuente: str = "osm", **kw) -> nx.MultiDiGraph:
+def red_para_solicitud(solicitud, fuente: str = "osm", progreso=None, **kw) -> nx.MultiDiGraph:
     if fuente == "osm":
         from engine.cobertura import obtener
-        return obtener(solicitud, **kw)
+        return obtener(solicitud, progreso=progreso, **kw)
     lat, lon, r = centro_y_radio(solicitud)
     if fuente == "sintetica":
         lado = max(3, int(2 * r // kw.get("paso_m", 200.0)) + 1)

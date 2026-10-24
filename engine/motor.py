@@ -171,9 +171,9 @@ def calcular_recorridos(solicitud, fuente: str = "osm", G: Optional[nx.MultiDiGr
     try:
         if G is None:
             avisar("Obteniendo calles…")
-            G = red_para_solicitud(sol, fuente=fuente)
+            G = red_para_solicitud(sol, fuente=fuente, progreso=avisar)
     except Exception as e:
-        return Resultado(estado="error", mensaje=str(e))
+        return Resultado(estado="error", mensaje=str(e),red={'download_errors':getattr(e,'attempts',[])})
 
     avisar("Aplicando exclusiones…")
     H, n_excl = aplicar_exclusiones(G, sol.exclusiones)

@@ -93,3 +93,7 @@ Repetición:
 ```
 
 Se genera una distribución **onedir**: hay que conservar todo `dist/Q-Rescate`, incluidos `_internal`, QtWebEngine, DLL y datos. El `.exe` por sí solo no es distribuible. El resultado exacto del empaquetado y su comprobación se registra en `integration-evidence/REPORT.md`; construirlo no basta para afirmar que funciona en otra Windows limpia.
+
+## Disponibilidad de servidores OSM
+
+La descarga verifica el estado de dos servidores públicos (overpass-api.de y overpass.private.coffee) y cambia de instancia si hay fallo o saturación. No hay disponibilidad garantizada de estos servicios externos. Se puede calcular sin Internet cuando existe una caché que cubra íntegramente la selección; una red parcial nunca sustituye silenciosamente la solicitada. La copia instalada debe cerrarse y abrirse después de actualizar el código.

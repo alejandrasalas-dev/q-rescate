@@ -471,7 +471,9 @@ class MainWindow(QMainWindow):
         if snapshot.progress_percent is None:self.progress.setRange(0,0);self.progress.setTextVisible(False)
         else:self.progress.setRange(0,100);self.progress.setValue(round(snapshot.progress_percent));self.progress.setTextVisible(True)
         message=' · '.join(snapshot.messages)
-        if snapshot.error:message=f'{snapshot.error.code}: {snapshot.error.message}'+(' · '+message if message else '')
+        if snapshot.error:
+            extras=list(dict.fromkeys(m for m in snapshot.messages if m!=snapshot.error.message))
+            message=snapshot.error.message+(' · '+' · '.join(extras) if extras else '')
         if snapshot.metadata.get('engine_result',{}).get('red',{}).get('fuente')=='sintetica':message='PRUEBA SINTÉTICA EXPLÍCITA · '+message
         if not message:message=STATES[snapshot.state]
         self.result_message.setText(message);self.statusBar().showMessage(message)
