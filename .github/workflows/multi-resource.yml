@@ -70,3 +70,30 @@ jobs:
           name: multi-resource-quantum
           path: experiments/results/multi-resource-quantum.json
           if-no-files-found: warn
+
+      - name: Geography vs quantum reliability - nine controlled runs
+        timeout-minutes: 5
+        run: |
+          python -m experiments.geo_qaoa_sweep --output experiments/results/geo-qaoa-sweep.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('experiments/results/geo-qaoa-sweep.json').read_text())
+          assert len(data['cases']) == 3
+          assert {c['span_km'] for c in data['cases']} == {20,200,1800}
+          for c in data['cases']:
+              assert c['qubits'] == 4
+              assert {r['seed'] for r in c['qaoa_by_seed']} == {3,7,42}
+              assert len(c['qaoa_by_seed']) == 3
+              assert 0 <= c['optimal_runs'] <= c['feasible_runs'] <= 3
+              for r in c['qaoa_by_seed']:
+                  assert r['cost'] is None or r['cost'] >= c['exact']['cost'] - 1e-5
+          print('Nine QAOA runs verified without assuming a quantum advantage.')
+          PY
+      - name: Upload geographic quantum sweep
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: geo-qaoa-sweep
+          path: experiments/results/geo-qaoa-sweep.json
+          if-no-files-found: warn
