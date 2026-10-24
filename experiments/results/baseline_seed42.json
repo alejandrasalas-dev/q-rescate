@@ -1,0 +1,370 @@
+{
+  "experiment": "depot_fixed_multi_stop_route",
+  "data_type": "synthetic",
+  "quantum_hardware_used": false,
+  "entries": [
+    {
+      "scenario": "normal",
+      "stops": [
+        "A",
+        "B"
+      ],
+      "size": 2,
+      "synthetic": true,
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "classical_exact": {
+        "tour": [
+          0,
+          1
+        ],
+        "cost": 17.0,
+        "runtime_seconds": 1.7424999896320514e-05,
+        "method": "exact_enumeration"
+      },
+      "classical_greedy": {
+        "tour": [
+          0,
+          1
+        ],
+        "cost": 17.0,
+        "runtime_seconds": 1.580299976922106e-05,
+        "method": "nearest_neighbor"
+      },
+      "qaoa": {
+        "status": "completed",
+        "feasible": true,
+        "tour": [
+          0,
+          1
+        ],
+        "cost": 17.0,
+        "runtime_seconds": 0.9921449499997834,
+        "seed": 42,
+        "reps": 1,
+        "optimizer": "COBYLA",
+        "maxiter": 35,
+        "shots": 512,
+        "qubits": 4,
+        "backend": "Qiskit StatevectorSampler (classical simulation)",
+        "gap_percent": 0.0
+      }
+    },
+    {
+      "scenario": "normal",
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "size": 3,
+      "synthetic": true,
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "classical_exact": {
+        "tour": [
+          0,
+          1,
+          2
+        ],
+        "cost": 23.0,
+        "runtime_seconds": 2.1662000108335633e-05,
+        "method": "exact_enumeration"
+      },
+      "classical_greedy": {
+        "tour": [
+          0,
+          1,
+          2
+        ],
+        "cost": 23.0,
+        "runtime_seconds": 8.882999281922821e-06,
+        "method": "nearest_neighbor"
+      },
+      "qaoa": {
+        "status": "completed",
+        "feasible": true,
+        "tour": [
+          0,
+          1,
+          2
+        ],
+        "cost": 23.0,
+        "runtime_seconds": 72.38325299000007,
+        "seed": 42,
+        "reps": 1,
+        "optimizer": "COBYLA",
+        "maxiter": 35,
+        "shots": 512,
+        "qubits": 9,
+        "backend": "Qiskit StatevectorSampler (classical simulation)",
+        "gap_percent": 0.0
+      }
+    },
+    {
+      "scenario": "bridge_closed",
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "size": 3,
+      "synthetic": true,
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          8.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          9.0,
+          7.0
+        ],
+        [
+          8.0,
+          7.0,
+          0.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0
+        ]
+      ],
+      "classical_exact": {
+        "tour": [
+          0,
+          2,
+          1
+        ],
+        "cost": 24.0,
+        "runtime_seconds": 1.887800044642063e-05,
+        "method": "exact_enumeration"
+      },
+      "classical_greedy": {
+        "tour": [
+          0,
+          2,
+          1
+        ],
+        "cost": 24.0,
+        "runtime_seconds": 8.19200067780912e-06,
+        "method": "nearest_neighbor"
+      },
+      "qaoa": {
+        "status": "completed",
+        "feasible": true,
+        "tour": [
+          0,
+          2,
+          1
+        ],
+        "cost": 24.0,
+        "runtime_seconds": 62.85851251799977,
+        "seed": 42,
+        "reps": 1,
+        "optimizer": "COBYLA",
+        "maxiter": 35,
+        "shots": 512,
+        "qubits": 9,
+        "backend": "Qiskit StatevectorSampler (classical simulation)",
+        "gap_percent": 0.0
+      }
+    },
+    {
+      "scenario": "flood_risk",
+      "stops": [
+        "A",
+        "B",
+        "C"
+      ],
+      "size": 3,
+      "synthetic": true,
+      "distance_matrix": [
+        [
+          0.0,
+          7.0,
+          7.0,
+          8.0
+        ],
+        [
+          10.0,
+          0.0,
+          5.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          7.0
+        ],
+        [
+          10.0,
+          7.0,
+          7.0,
+          0.0
+        ]
+      ],
+      "classical_exact": {
+        "tour": [
+          2,
+          0,
+          1
+        ],
+        "cost": 28.0,
+        "runtime_seconds": 2.7350999516784213e-05,
+        "method": "exact_enumeration"
+      },
+      "classical_greedy": {
+        "tour": [
+          0,
+          1,
+          2
+        ],
+        "cost": 29.0,
+        "runtime_seconds": 1.147700004366925e-05,
+        "method": "nearest_neighbor"
+      },
+      "qaoa": {
+        "status": "completed",
+        "feasible": true,
+        "tour": [
+          2,
+          0,
+          1
+        ],
+        "cost": 28.0,
+        "runtime_seconds": 63.396411207999336,
+        "seed": 42,
+        "reps": 1,
+        "optimizer": "COBYLA",
+        "maxiter": 35,
+        "shots": 512,
+        "qubits": 9,
+        "backend": "Qiskit StatevectorSampler (classical simulation)",
+        "gap_percent": 0.0
+      }
+    },
+    {
+      "scenario": "normal",
+      "stops": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "size": 4,
+      "synthetic": true,
+      "distance_matrix": [
+        [
+          0.0,
+          4.0,
+          7.0,
+          8.0,
+          8.0
+        ],
+        [
+          6.0,
+          0.0,
+          5.0,
+          7.0,
+          7.0
+        ],
+        [
+          8.0,
+          5.0,
+          0.0,
+          4.0,
+          4.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          0.0,
+          2.0
+        ],
+        [
+          10.0,
+          7.0,
+          5.0,
+          3.0,
+          0.0
+        ]
+      ],
+      "classical_exact": {
+        "tour": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "cost": 25.0,
+        "runtime_seconds": 5.6833000598999206e-05,
+        "method": "exact_enumeration"
+      },
+      "classical_greedy": {
+        "tour": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "cost": 25.0,
+        "runtime_seconds": 1.656499989621807e-05,
+        "method": "nearest_neighbor"
+      },
+      "qaoa": {
+        "status": "skipped",
+        "reason": "16 qubits > guard 9",
+        "qubits": 16,
+        "gap_percent": null
+      }
+    }
+  ]
+}

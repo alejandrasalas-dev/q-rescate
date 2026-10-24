@@ -1,0 +1,125 @@
+{
+  "case": "cancel",
+  "scenario": {
+    "name": "Ejemplo OSM · Satipo",
+    "base": {
+      "id": "H",
+      "name": "Base (centro de Satipo)",
+      "lat": -11.2537,
+      "lng": -74.6378
+    },
+    "destinations": [
+      {
+        "id": "A",
+        "name": "Punto 1",
+        "lat": -11.248,
+        "lng": -74.634
+      },
+      {
+        "id": "B",
+        "name": "Punto 2",
+        "lat": -11.26,
+        "lng": -74.642
+      },
+      {
+        "id": "C",
+        "name": "Punto 3",
+        "lat": -11.256,
+        "lng": -74.63
+      }
+    ],
+    "zones": [
+      {
+        "id": "operation-example",
+        "name": "Zona de operación",
+        "lat": -11.2537,
+        "lng": -74.6378,
+        "radius_m": 1500,
+        "kind": "operation"
+      }
+    ],
+    "config": {
+      "methods": [
+        "exact",
+        "greedy"
+      ],
+      "seed": 42,
+      "shots": 512,
+      "reps": 1,
+      "maxiter": 35,
+      "vehicles": 1,
+      "timeout_seconds": 180
+    },
+    "schema_version": 1
+  },
+  "snapshot": {
+    "job_id": "9cf4a16c84fd46f28ca1ac863f68898d",
+    "state": "cancelled",
+    "results": [],
+    "messages": [
+      "Cálculo cancelado por el usuario."
+    ],
+    "progress_percent": null,
+    "error": null,
+    "experiment_rows": [],
+    "metadata": {
+      "engine_result": {
+        "estado": "cancelado",
+        "mensaje": "Cálculo cancelado por el usuario.",
+        "puntos": [],
+        "inaccesibles": [],
+        "matriz_min": [],
+        "metodos": [],
+        "red": {}
+      },
+      "engine_request": {
+        "base": {
+          "id": "H",
+          "nombre": "Base (centro de Satipo)",
+          "lat": -11.2537,
+          "lon": -74.6378
+        },
+        "destinos": [
+          {
+            "id": "A",
+            "nombre": "Punto 1",
+            "lat": -11.248,
+            "lon": -74.634
+          },
+          {
+            "id": "B",
+            "nombre": "Punto 2",
+            "lat": -11.26,
+            "lon": -74.642
+          },
+          {
+            "id": "C",
+            "nombre": "Punto 3",
+            "lat": -11.256,
+            "lon": -74.63
+          }
+        ],
+        "zona_operacion": {
+          "lat": -11.2537,
+          "lon": -74.6378,
+          "radio_m": 1500
+        },
+        "exclusiones": [],
+        "metodos": [
+          "exacto",
+          "voraz"
+        ],
+        "semilla": 42,
+        "shots": 512,
+        "max_qubits": 9,
+        "timeout_s": 180
+      },
+      "unreachable_ids": [],
+      "snapped_points": []
+    }
+  },
+  "wall_seconds": 2.6473003999562934,
+  "stages": [
+    "Cálculo cancelado por el usuario."
+  ]
+}
