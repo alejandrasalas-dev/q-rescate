@@ -1,0 +1,52 @@
+name: Test multi-stop routing and QAOA benchmark
+
+on:
+  push:
+    branches: [feat/real-routing]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run exact road-routing and QUBO tests
+        run: python -m pytest tests/test_routing.py -q
+      - name: Verify reference classic routes
+        run: python routing.py --classical-only > routing-classical.json
+      - name: Run multi-stop routing quantum benchmark
+        run: |
+          set -o pipefail
+          python routing.py --max-qubits 9 | tee routing-benchmark.json
+      - name: Validate benchmark schema and basic feasibility
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('routing-benchmark.json').read_text())
+          assert data['quantum_hardware_used'] is False
+          assert len(data['entries']) == 5
+          assert all(e['classical_exact']['cost'] <= e['classical_greedy']['cost'] for e in data['entries'])
+          assert all('qaoa' in e for e in data['entries'])
+          assert all(e['qaoa']['status'] == 'skipped' for e in data['entries'] if e['size'] == 4)
+          print('Routing benchmark schema validated')
+          PY
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: multi-stop-routing-results
+          path: |
+            routing-classical.json
+            routing-benchmark.json
+          if-no-files-found: warn
