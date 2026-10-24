@@ -120,9 +120,21 @@ y fuentes; no asumir que las penalizaciones actuales representan probabilidades.
 
 El workflow de rutas se activa para PR hacia `feat/real-routing` y conserva los
 resultados como artifacts. Separa pruebas, ejecución y revisión de validez/gap;
-no exige gap cero ni afirma superioridad. Falta ejecutar GitHub Actions en el
-repositorio remoto tras publicar el PR. El destino del PR es `feat/real-routing`;
-no se debe fusionar automáticamente.
+no exige gap cero ni afirma superioridad. Las ejecuciones remotas y sus artifacts
+se consultan en el [PR #10](https://github.com/alejandrasalas-dev/q-rescate/pull/10).
+El destino del PR es `feat/real-routing`; no se debe fusionar automáticamente.
+
+La primera ejecución por `push` [40120145692](https://github.com/alejandrasalas-dev/q-rescate/actions/runs/40120145692)
+aprobó 42 tests, pero la referencia superó su plazo de 4 minutos. En cambio,
+la ejecución simultánea del PR completó esa referencia y produjo cuatro
+soluciones óptimas; se revisó su artifact. Este fallo de duración queda registrado
+y no se confunde con un resultado de calidad de QAOA.
+
+El workflow revisado limita la referencia a 6 minutos y el job a 24 minutos;
+el estudio mantiene 120 s por ejecución y 900 s de presupuesto global. Se fija
+un hilo por BLAS/OpenMP también para la referencia. Sólo se dispara por PR
+para la rama de Carlos, evitando duplicar todo el estudio por `push` y por PR.
+El resultado final de CI debe revisarse en el último commit del PR.
 
 ## Resultados observados
 

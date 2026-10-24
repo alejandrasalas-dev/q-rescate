@@ -2,7 +2,7 @@ name: Test multi-stop routing and QAOA benchmark
 
 on:
   push:
-    branches: [feat/real-routing, feat/carlos-benchmarks]
+    branches: [feat/real-routing]
   pull_request:
     branches: [main, feat/real-routing]
   workflow_dispatch:
@@ -10,7 +10,12 @@ on:
 jobs:
   routing:
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 24
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      NUMEXPR_NUM_THREADS: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -25,7 +30,7 @@ jobs:
       - name: Verify reference classic routes
         run: python routing.py --classical-only > routing-classical.json
       - name: Run multi-stop routing quantum benchmark
-        timeout-minutes: 4
+        timeout-minutes: 6
         run: |
           set -o pipefail
           python routing.py --max-qubits 9 | tee routing-benchmark.json
