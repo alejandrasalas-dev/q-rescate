@@ -188,26 +188,101 @@ $$A_{\text{auto}}=\max\big(1000,\ \mathrm{UB}\big),\qquad \mathrm{UB}=\sum_{u}\m
 | `tests/test_penalizacion.py` (7) | **7 fallan** | 7 pasan |
 | Suite completa | — | **38 pasan** |
 
-### 3.5 Efecto de la magnitud sobre QAOA (hallazgo para Carlos, issue #6)
+### 3.5 Nota para Carlos (issue #6)
 
-La corrección **no** busca mejorar QAOA, porque eso depende de la configuración del algoritmo. Las mediciones fueron estas:
+La corrección busca que **la formulación sea correcta en cualquier escala**. No pretende mejorar el rendimiento de QAOA, porque eso depende de la configuración del algoritmo y su validación experimental le corresponde a Carlos.
 
-**Distribución completa** (statevector, 10 semillas, `analisis/validacion_qubo.py`):
-- Con p=1 y 35 iteraciones, $A=1000$ y $A$ calibrada (igual a la peor ruta) dan prácticamente lo mismo: entre 0.2 % y 0.9 % de probabilidad de la ruta óptima, cerca del 0.2 % del azar.
-- Solo la combinación de $A$ calibrada, $H_C$ normalizado, CVaR, p=2 y 150 iteraciones sube la probabilidad a entre 4.1 % y 4.7 %, es decir 21–24 veces el azar.
+Se le entregan dos observaciones:
 
-**Métrica del benchmark** (mejor de 512 muestras, `qaoa_tour`, semillas 0 y 2):
+- Con la configuración actual (p=1, 35 iteraciones), $A=1000$ deja la distribución de QAOA casi uniforme. Con 512 muestras sobre 512 estados, la mejor muestra suele ser la ruta óptima incluso sin que QAOA concentre probabilidad en ella.
+- Es preferible medir también la probabilidad de la ruta óptima en cada medición, comparada con el azar. La herramienta para hacerlo está en `analisis/validacion_qubo.py` y los datos en `analisis/resultados_validacion.json`.
 
-| Caso | $A=1000$ | $A$ = UB (≈30) |
+Por esta razón la corrección mantiene 1000 como valor mínimo: con los datos actuales no cambia ningún resultado del benchmark.
+
+---
+
+## 4. Verificación: QUBO, ruta decodificada y costo original
+
+### 4.1 Qué se verificó
+
+Para **cada ruta válida** $\pi$ se construyó su vector binario ($x_{p,\pi(p)}=1$) y se comprobaron tres igualdades:
+
+$$
+\underbrace{Q(x_\pi)}_{\texttt{qp.objective.evaluate}}
+=\underbrace{C(\pi)}_{\texttt{tour\_cost}}
+=\underbrace{\langle x_\pi|H_C|x_\pi\rangle+\text{offset}}_{\text{energía de Ising}},
+\qquad \texttt{decode\_tour}(x_\pi)=\pi
+$$
+
+| Escenarios | $n$ | Rutas válidas por escenario | QUBO = costo | Ising = costo | Decodificación |
+|---|---|---|---|---|---|
+| normal, bridge_closed, flood_risk | 2 | 2 | ✔ | ✔ | ✔ |
+| normal, bridge_closed, flood_risk | 3 | 6 | ✔ | ✔ | ✔ |
+| normal, bridge_closed, flood_risk | 4 | 24 | ✔ | (16 qubits, no evaluado) | ✔ |
+| **Total** | | **96 rutas** | **96/96** | **24/24** | **96/96** |
+
+Esto amplía el test del equipo `test_qubo_energy_equals_original_cost_for_every_valid_tour`, que solo cubre el escenario `normal`, a los 3 escenarios y a $n=4$. El nuevo test es `test_qubo_ising_y_costo_coinciden_en_todos_los_escenarios`.
+
+Junto con la Proposición 1 (los estados válidos son exactamente las $n!$ rutas) y la Proposición 3 (ningún estado inválido es mínimo), esto implica que **el mínimo del QUBO, y por tanto el estado fundamental del Hamiltoniano, es la ruta óptima**. Lo confirma el test `test_ising_tiene_minimo_en_la_ruta_optima`.
+
+### 4.2 Supuestos del modelo
+
+| Supuesto | Implicación |
+|---|---|
+| Una sola unidad (ambulancia, brigada o camión) | No resuelve varios vehículos (VRP) |
+| Costos $c_{uv}\ge 0$ y conocidos de antemano | Necesario para la Proposición 3. Los cierres y riesgos entran **antes**, vía Dijkstra |
+| Todos los puntos deben atenderse | No hay priorización ni puntos opcionales |
+| Costo = suma de tiempos de tramo | No modela ventanas horarias, capacidad ni tiempo de servicio en cada punto |
+| Red estática durante la ruta | Un cierre nuevo exige recalcular la matriz y volver a optimizar |
+| Datos sintéticos | No hay calibración con datos reales |
+
+### 4.3 Límites
+
+- **Qubits:** se necesitan $n^2$. Con $n=4$ son 16, que es el límite práctico del simulador local; con $n=10$ serían 100.
+- **Estados válidos:** son una fracción mínima del total, $n!/2^{n^2}$: 1.2 % para $n=3$ y 0.04 % para $n=4$. QAOA con el mezclador estándar $X$ explora sobre todo estados inválidos.
+- **Extensiones posibles:**
+  - Mezcladores que preservan las restricciones (XY-mixer / QAOA+), que solo exploran permutaciones.
+  - Descomposición híbrida: agrupar puntos con un método clásico y aplicar QAOA a cada subruta.
+  - Multivehículo: añadir un índice de vehículo, lo que da $K\,n^2$ qubits.
+
+---
+
+## 5. Por qué esta formulación tiene sentido para Q-Route
+
+### 5.1 Un solo modelo para distintos escenarios
+
+El modelo cuántico **no sabe** si la unidad es una ambulancia, un camión de bomberos o un camión de víveres. Todo el escenario entra a través de una única pieza: la matriz $c_{uv}$, calculada con la capa clásica (red vial + Dijkstra).
+
+```
+ Escenario (red vial, cierres, riesgos)  →  Dijkstra  →  matriz c_uv  →  QUBO  →  Ising  →  QAOA / exacto / heurística
+           ↑ cambia según el caso                          ↑ desde aquí todo es idéntico
+```
+
+| Escenario | Qué cambia en la red | Qué **no** cambia |
 |---|---|---|
-| bridge_closed, semilla 0 | 24 (óptimo) | 25 |
-| bridge_closed, semilla 2 | 24 (óptimo) | 25 |
-| normal, semilla 0 | 23 (óptimo) | 24 |
-| normal, semilla 2 | 24 | 24 |
+| **El Niño** (caso de storytelling) | Vías inundadas o con huaico se eliminan; vías en riesgo cuestan más tiempo | Variables, restricciones, QUBO, Hamiltoniano y QAOA |
+| **Incendio urbano** | Calles obstruidas se eliminan; congestión cerca del foco aumenta el tiempo | Igual |
+| **Logística o suministros** | Tiempos o costos de reparto entre almacenes y comunidades | Igual |
 
-**Interpretación:**
-- Con $A=1000$, a p=1 la distribución queda casi uniforme, y 512 muestras de 512 estados cubren el óptimo unas 63 % de las veces o más.
-- Con $A$ pequeña el optimizador concentra la probabilidad, pero a p=1 lo hace en estados que no son los óptimos.
-- **Conclusión:** que "la mejor de 512 muestras iguala al óptimo" mide sobre todo la cobertura del muestreo, no una concentración real de QAOA. Por eso la corrección mantiene 1000 como piso y no cambia el valor por defecto para los datos actuales.
+En el código esto ya se cumple: `bridge_closed` (cierre) y `flood_risk` (+8 min) solo modifican el grafo, y `quadratic_program()` no cambia.
 
-<!-- Secciones siguientes: 4 verificación QUBO = costo · 5 explicación 90 s · 6 Grover (nota) · 7 referencias -->
+### 5.2 Por qué QUBO
+
+- Las decisiones del problema son **sí o no** ("¿el punto $i$ va en el turno $p$?"), lo que encaja con variables binarias.
+- Las reglas son de tipo "exactamente uno", que se expresan bien como penalidades cuadráticas.
+- QUBO es el formato de entrada estándar de los optimizadores cuánticos: QAOA, *quantum annealing* y `GroverOptimizer` en Qiskit. Además es intercambiable con solucionadores clásicos, lo que permite **comparar con la misma formulación**.
+
+### 5.3 Por qué QAOA
+
+- **Se deriva directamente del problema:** $H_C$ sale del QUBO sin pasos intermedios, y el estado fundamental es la ruta óptima (sección 4.1).
+- **Es apto para el hardware actual (NISQ):** usa circuitos poco profundos (pocas capas $p$) y un optimizador clásico, es decir, es un enfoque **híbrido**.
+- **Tiene una base teórica sólida:** cuando $p\to\infty$ recupera la evolución adiabática y alcanza el óptimo. Con $p$ pequeño es una heurística y debe validarse empíricamente contra métodos clásicos, que es lo que hace el benchmark del equipo.
+
+### 5.4 Lo que **no** afirmamos
+
+- No afirmamos que QAOA sea más rápido ni mejor que los métodos clásicos: en estos tamaños el método exacto es instantáneo.
+- No usamos hardware cuántico real, solo un simulador clásico.
+- **Lo que sí afirmamos:** la formulación es **correcta** (secciones 1 a 4), **general** (5.1) y **compatible** con algoritmos cuánticos actuales y futuros. Q-Route queda preparada para evaluarlos cuando el hardware madure.
+
+<!-- Secciones siguientes: 6 explicación 90 s · 7 Grover (nota) · 8 referencias -->
+
