@@ -130,8 +130,12 @@ def quadratic_program(matrix: np.ndarray, penalty: float = 1000):
 
 
 def decode_tour(bits: Sequence[float], n: int) -> list[int] | None:
-    arr = np.asarray(bits).reshape(n, n)
-    if not np.all(np.isclose(arr, np.round(arr))):
+    try:
+        arr = np.asarray(bits, dtype=float).reshape(n, n)
+    except (TypeError, ValueError):
+        return None
+    # Integer row/column sums alone also admit e.g. [[-1, 2], [2, -1]].
+    if not np.all(np.isfinite(arr)) or not np.all((arr == 0) | (arr == 1)):
         return None
     if not np.all(arr.sum(axis=0) == 1) or not np.all(arr.sum(axis=1) == 1):
         return None

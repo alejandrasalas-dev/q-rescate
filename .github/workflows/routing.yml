@@ -2,15 +2,15 @@ name: Test multi-stop routing and QAOA benchmark
 
 on:
   push:
-    branches: [feat/real-routing]
+    branches: [feat/real-routing, feat/carlos-benchmarks]
   pull_request:
-    branches: [main]
+    branches: [main, feat/real-routing]
   workflow_dispatch:
 
 jobs:
   routing:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,10 +21,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
       - name: Run exact road-routing and QUBO tests
-        run: python -m pytest tests/test_routing.py -q
+        run: python -m pytest tests/test_routing.py tests/test_benchmark_reliability.py -q
       - name: Verify reference classic routes
         run: python routing.py --classical-only > routing-classical.json
       - name: Run multi-stop routing quantum benchmark
+        timeout-minutes: 4
         run: |
           set -o pipefail
           python routing.py --max-qubits 9 | tee routing-benchmark.json
@@ -49,4 +50,32 @@ jobs:
           path: |
             routing-classical.json
             routing-benchmark.json
+          if-no-files-found: warn
+      - name: Run bounded reliability study
+        timeout-minutes: 16
+        run: |
+          python experiments/benchmark_reliability.py --seeds 3 7 42 --max-qubits 9 --timeout-seconds 120 --total-seconds 900 --output experiments/results/ci-reliability.json
+      - name: Review reliability results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('experiments/results/ci-reliability.json').read_text())
+          for case in d['cases']:
+              quantum=[r for r in case['results'] if r['method']=='QAOA']
+              assert len(quantum)==3
+              assert all(r['matrix_sha256']==case['matrix_sha256'] for r in case['results'])
+              if case['size']==4:
+                  assert all(r['status']=='skipped' and r['qubits']==16 for r in quantum)
+              else:
+                  assert all(r['status']=='completed' and r['validated_feasible'] for r in quantum)
+                  assert all(r['gap_percent'] is not None and r['gap_percent']>=-1e-8 for r in quantum)
+          print('Validez y metadatos revisados; no se exige optimalidad ni ventaja cuántica.')
+          PY
+      - name: Upload reliability results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: routing-reliability-results
+          path: experiments/results/ci-reliability.*
           if-no-files-found: warn
