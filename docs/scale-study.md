@@ -50,6 +50,14 @@ python -m experiments.scale_study --quantum --output experiments/results/scale-q
 
 La segunda ejecución con QAOA utiliza un simulador ideal local; tarda más y se limita a 9 qubits. GitHub Actions publica el JSON como artefacto **solo si la ejecución finaliza** y verifica estructura y estado.
 
+## Validación CI en GitHub (ejecución final)
+
+- [Run #40123109176](https://github.com/alejandrasalas-dev/q-rescate/actions/runs/40123109176): **Success**. Las pruebas automáticas aprobaron; se ejecutaron los 27 casos clásicos y se publicaron los artefactos `qroute-scale-classical` y `qroute-scale-quantum`.
+- Caso QAOA adicional: **100 nodos viales, 3 destinos, escenario de cierre**. QAOA (9 qubits, semilla 42, COBYLA 35 iteraciones, 512 shots) devolvió ruta válida `[2,1,0]` y **costo 138**, igual a Held-Karp exacto (138) y 2-opt (138); vecino más cercano obtuvo 161.
+- El solucionador QAOA tardó **92,72 s** frente a ~**0,000024 s** de Held-Karp y ~**0,000030 s** de 2-opt en esta ejecución. No constituye una comparación completa de despliegue ni de QPU físico.
+- **Interpretación:** QAOA igualó el óptimo pero no demostró superioridad en velocidad ni calidad frente a métodos clásicos fuertes. No se ejecutó QAOA para 6 o 10 destinos debido al límite de qubits.
+- Datos sintéticos, circuito simulado en procesador clásico, un solo vehículo y cierres simulados. El tamaño de la red procesada no equivale al tamaño del problema enviado al circuito.
+
 ## Qué aportaría evidencia de «usar cuántica aquí y clásico allá»
 
 La comparación debe medir **la misma función objetivo, restricciones, instancias, semillas y criterios de recursos**. Se requeriría:
