@@ -51,3 +51,25 @@ def test_estados_validos_son_exactamente_las_n_factorial_permutaciones(n):
         if t is not None:
             validos.add(tuple(t))
     assert validos == set(itertools.permutations(range(n)))
+
+
+@pytest.mark.parametrize("scenario", ["normal", "bridge_closed", "flood_risk"])
+@pytest.mark.parametrize("n", [2, 3, 4])
+def test_qubo_ising_y_costo_coinciden_en_todos_los_escenarios(scenario, n):
+    """Para cada ruta válida: QUBO == tour_cost == energía de Ising (n<=3) y decode correcto."""
+    m = travel_matrix(road_network(scenario), STOPS[:n])
+    model = quadratic_program(m)
+    diag = None
+    if n <= 3:
+        op, offset = model.to_ising()
+        diag = np.real(np.diag(op.to_matrix())) + offset
+    for tour in itertools.permutations(range(n)):
+        bits = np.zeros(n * n, dtype=int)
+        for p, i in enumerate(tour):
+            bits[n * p + i] = 1
+        cost = tour_cost(m, tour)
+        assert np.isclose(model.objective.evaluate(bits), cost)
+        assert decode_tour(bits, n) == list(tour)
+        if diag is not None:
+            idx = int(sum(int(b) << k for k, b in enumerate(bits)))
+            assert np.isclose(diag[idx], cost)
